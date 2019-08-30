@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tree_node_color_1 = require("./tree-node-color");
 /**
  * Red Black Tree node.
- * @constructor
- * @param {*} data
  */
 class TreeNode {
     constructor(data, asArray) {
@@ -18,3 +16,4 @@ class TreeNode {
     }
 }
 exports.default = TreeNode;
+//# sourceMappingURL=tree-node.js.map

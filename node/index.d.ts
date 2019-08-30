@@ -1,20 +1,19 @@
-import Node from './src/tree-node';
-/**
- * @param compare
- * @param datas
- * @param replaceDups - If true then if a duplicate is
- * inserted (as per the equivalence relation induced by the compare)
- * then replace it. If false then keep an array of values at the relevant
- * node.
- */
+import Node from './tree-node';
 declare class LlRbTree<T> {
     private replaceDups;
     private compare;
     root: Node<T>;
+    /**
+     * @param compare
+     * @param datas
+     * @param replaceDups - If true then if a duplicate is inserted (as per the
+     * equivalence relation induced by the compare) then replace it. If false
+     * then instead keep an array of values at the relevant node.
+     */
     constructor(compare: (a: T, b: T) => number, datas: T[], replaceDups: boolean);
     /**
-     * Destructively sets the tree compare. This function can be used for for e.g.
-     * the Bentley Ottmann algorithm.
+     * Destructively sets the tree compare. This function can be used for for
+     * e.g.the Bentley Ottmann algorithm.
      */
     setComparator(compare: (a: T, b: T) => number, replaceDups: boolean): void;
     isEmpty(): boolean;
@@ -47,9 +46,9 @@ declare class LlRbTree<T> {
      */
     findBounds(data: T): Array<Node<T>>;
     /**
-     * @param {LlRbTree} tree
-     * @param {*} data
-     * @returns {Node[]} The two ordered nodes bounding the data. If the
+     * @param tree
+     * @param data
+     * @returns The two ordered nodes bounding the data. If the
      * data falls on a node, returns the nodes before and after this one.
      */
     findBoundsExcl(data: T): Array<Node<T>>;
@@ -57,7 +56,7 @@ declare class LlRbTree<T> {
      *
      */
     findAllInOrder(data: T): Array<Node<T>>;
-    private getMinOrMaxNode(dir);
+    private getMinOrMaxNode;
     getMinNode: (node: Node<T>) => Node<T>;
     getMaxNode: (node: Node<T>) => Node<T>;
     min(node: Node<T>): T | T[];

@@ -1,33 +1,32 @@
-/*
- * Concise, Destructive, Left Leaning Red Black Tree implementation.
- * See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
- * See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
- * See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
- */
 
-import Node  from './src/tree-node';
-import Color from './src/tree-node-color';
-import Dir   from './src/tree-node-direction';
+// Concise, Destructive, Left Leaning Red Black Tree implementation.
+// See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
+// See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
+// See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
+
+
+import Node  from './tree-node';
+import Color from './tree-node-color';
+import Dir   from './tree-node-direction';
 
 function isRed<T>(node: Node<T>): boolean {
 	return node && node.color === Color.RED;
 }
 
 
-/** 
- * @param compare
- * @param datas
- * @param replaceDups - If true then if a duplicate is 
- * inserted (as per the equivalence relation induced by the compare)
- * then replace it. If false then keep an array of values at the relevant
- * node.  
- */	
 class LlRbTree<T> {
 	private replaceDups: boolean; 
 	private compare: (a: T, b: T|T[]) => number;
 
 	public root: Node<T>;
 
+	/** 
+	 * @param compare
+	 * @param datas
+	 * @param replaceDups - If true then if a duplicate is inserted (as per the 
+	 * equivalence relation induced by the compare) then replace it. If false 
+	 * then instead keep an array of values at the relevant node.  
+	 */	
 	constructor(
 			compare: (a: T, b: T) => number, 
 			datas: T[], 
@@ -48,8 +47,8 @@ class LlRbTree<T> {
 
 
 	/**
-	 * Destructively sets the tree compare. This function can be used for for e.g.
-	 * the Bentley Ottmann algorithm. 
+	 * Destructively sets the tree compare. This function can be used for for 
+	 * e.g.the Bentley Ottmann algorithm. 
 	 */
 	public setComparator(
 			compare: (a: T, b: T) => number, 
@@ -259,9 +258,9 @@ class LlRbTree<T> {
 
 
 	/**
-	 * @param {LlRbTree} tree
-	 * @param {*} data
-	 * @returns {Node[]} The two ordered nodes bounding the data. If the  
+	 * @param tree
+	 * @param data
+	 * @returns The two ordered nodes bounding the data. If the  
 	 * data falls on a node, returns the nodes before and after this one. 
 	 */
 	public findBoundsExcl(data: T): Array<Node<T>> {

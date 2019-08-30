@@ -6,3 +6,4 @@ var TreeNodeColor;
     TreeNodeColor[TreeNodeColor["RED"] = 1] = "RED";
 })(TreeNodeColor || (TreeNodeColor = {}));
 exports.default = TreeNodeColor;
+//# sourceMappingURL=tree-node-color.js.map

@@ -1,26 +1,23 @@
 "use strict";
-/*
- * Concise, Destructive, Left Leaning Red Black Tree implementation.
- * See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
- * See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
- * See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html
- */
+// Concise, Destructive, Left Leaning Red Black Tree implementation.
+// See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
+// See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
+// See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
 Object.defineProperty(exports, "__esModule", { value: true });
-const tree_node_1 = require("./src/tree-node");
-const tree_node_color_1 = require("./src/tree-node-color");
-const tree_node_direction_1 = require("./src/tree-node-direction");
+const tree_node_1 = require("./tree-node");
+const tree_node_color_1 = require("./tree-node-color");
+const tree_node_direction_1 = require("./tree-node-direction");
 function isRed(node) {
     return node && node.color === tree_node_color_1.default.RED;
 }
-/**
- * @param compare
- * @param datas
- * @param replaceDups - If true then if a duplicate is
- * inserted (as per the equivalence relation induced by the compare)
- * then replace it. If false then keep an array of values at the relevant
- * node.
- */
 class LlRbTree {
+    /**
+     * @param compare
+     * @param datas
+     * @param replaceDups - If true then if a duplicate is inserted (as per the
+     * equivalence relation induced by the compare) then replace it. If false
+     * then instead keep an array of values at the relevant node.
+     */
     constructor(compare, datas, replaceDups) {
         this.getMinNode = this.getMinOrMaxNode(tree_node_direction_1.default.LEFT);
         this.getMaxNode = this.getMinOrMaxNode(tree_node_direction_1.default.RIGHT);
@@ -36,8 +33,8 @@ class LlRbTree {
         }
     }
     /**
-     * Destructively sets the tree compare. This function can be used for for e.g.
-     * the Bentley Ottmann algorithm.
+     * Destructively sets the tree compare. This function can be used for for
+     * e.g.the Bentley Ottmann algorithm.
      */
     setComparator(compare, replaceDups) {
         if (replaceDups) {
@@ -217,9 +214,9 @@ class LlRbTree {
         return bounds;
     }
     /**
-     * @param {LlRbTree} tree
-     * @param {*} data
-     * @returns {Node[]} The two ordered nodes bounding the data. If the
+     * @param tree
+     * @param data
+     * @returns The two ordered nodes bounding the data. If the
      * data falls on a node, returns the nodes before and after this one.
      */
     findBoundsExcl(data) {
@@ -395,3 +392,4 @@ function fixUp(h) {
     return h;
 }
 exports.default = LlRbTree;
+//# sourceMappingURL=index.js.map
