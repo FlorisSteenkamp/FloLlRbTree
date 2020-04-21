@@ -40,7 +40,7 @@
         "webpack-cli": "^3.3.7"
     },
     "scripts": {
-        "build": "npm run build-node && npm run build-browser",
+        "build": "npm run build-browser && npm run build-node",
         "build-node": "rimraf node && tsc",
         "build-browser": "rimraf browser && webpack",
         "test": "nyc mocha"
