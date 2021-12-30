@@ -125,7 +125,7 @@ class LlRbTree<T> {
 			let c = (tree.compare as (a: T, b: T) => number)(datum, h.datum as T);
 			if (c === 0) {
 				if (tree.replaceDups) {
-					h.datum = datum;				
+					h.datum = datum;
 				} else {
 					(h.datum as T[]).push(datum as T);
 				}
