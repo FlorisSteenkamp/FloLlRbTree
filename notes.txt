@@ -1,0 +1,20 @@
+Send new patch version to npm
+-----------------------------
+From cli (from ./double-double folder)
+0. update package versions (`ncu` or `ncu -u`)
+0. `npm install`
+1. `npm run build
+0. `npm test (skip if coverage below will be run anyway)
+0. `npm run coverage
+2. Commit changes locally
+3. `npm version patch / minor / major
+4. `git push origin master
+5. `git push --tags
+6. `npm publish
+7. check that it is published: `npm show double-double` / `npm show double-double version`
+
+
+Info
+====
+npm account name: floris / florissteenkamp
+

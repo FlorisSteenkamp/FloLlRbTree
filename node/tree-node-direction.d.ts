@@ -1,5 +1,4 @@
-declare enum TreeNodeDirection {
-    LEFT = 0,
-    RIGHT = 1
-}
-export default TreeNodeDirection;
+declare const LEFT = 0;
+declare const RIGHT = 1;
+declare type Dir = typeof LEFT | typeof RIGHT;
+export { LEFT, RIGHT, Dir };

@@ -1,9 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var TreeNodeDirection;
-(function (TreeNodeDirection) {
-    TreeNodeDirection[TreeNodeDirection["LEFT"] = 0] = "LEFT";
-    TreeNodeDirection[TreeNodeDirection["RIGHT"] = 1] = "RIGHT";
-})(TreeNodeDirection || (TreeNodeDirection = {}));
-exports.default = TreeNodeDirection;
+const LEFT = 0;
+const RIGHT = 1;
+export { LEFT, RIGHT };
 //# sourceMappingURL=tree-node-direction.js.map

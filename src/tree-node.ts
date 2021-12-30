@@ -1,24 +1,24 @@
-
-import Color from './tree-node-color';
+import { RED, type Color } from './tree-node-color.js';
 
 
 /**
  * Red Black Tree node.
  */
 class TreeNode<T> {
-	public data: T|T[];
+	public datum: T | T[];
 	public color: Color;
 	public parent: TreeNode<T> | undefined;
-	[key: number]: TreeNode<T>;
+	[key: number]: TreeNode<T> | null;
 
-	constructor(data: T, asArray?: boolean) {
+	constructor(datum: T, asArray?: boolean) {
 		if (asArray) {
-			this.data = [data];
+			this.datum = [datum];
 		} else {
-			this.data = data;
+			this.datum = datum;
 		}
-		this.color = Color.RED;
+		this.color = RED;
 	}
 }
 
-export default TreeNode;
+
+export { TreeNode }

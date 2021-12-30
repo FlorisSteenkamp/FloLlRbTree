@@ -1,19 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const tree_node_color_1 = require("./tree-node-color");
+import { RED } from './tree-node-color.js';
 /**
  * Red Black Tree node.
  */
 class TreeNode {
-    constructor(data, asArray) {
+    constructor(datum, asArray) {
         if (asArray) {
-            this.data = [data];
+            this.datum = [datum];
         }
         else {
-            this.data = data;
+            this.datum = datum;
         }
-        this.color = tree_node_color_1.default.RED;
+        this.color = RED;
     }
 }
-exports.default = TreeNode;
+export { TreeNode };
 //# sourceMappingURL=tree-node.js.map

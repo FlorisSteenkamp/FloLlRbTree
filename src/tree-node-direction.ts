@@ -1,4 +1,7 @@
+const LEFT = 0;
+const RIGHT = 1;
 
-enum TreeNodeDirection { LEFT, RIGHT }
+type Dir = typeof LEFT | typeof RIGHT;
 
-export default TreeNodeDirection;
+
+export { LEFT, RIGHT, Dir }

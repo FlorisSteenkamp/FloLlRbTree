@@ -1,10 +1,84 @@
+var FloLlRbTree;
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "LlRbTree": () => (/* binding */ LlRbTree)
+});
+
+;// CONCATENATED MODULE: ./src/tree-node-color.ts
+const BLACK = 0;
+const RED = 1;
+
+
+;// CONCATENATED MODULE: ./src/tree-node.ts
+
+/**
+ * Red Black Tree node.
+ */
+class TreeNode {
+    constructor(datum, asArray) {
+        if (asArray) {
+            this.datum = [datum];
+        }
+        else {
+            this.datum = datum;
+        }
+        this.color = RED;
+    }
+}
+
+
+;// CONCATENATED MODULE: ./src/tree-node-direction.ts
+const LEFT = 0;
+const RIGHT = 1;
+
+
+;// CONCATENATED MODULE: ./src/index.ts
 // Concise, Destructive, Left Leaning Red Black Tree implementation.
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
-import { TreeNode as Node } from './tree-node.js';
-import { RED, BLACK } from './tree-node-color.js';
-import { LEFT, RIGHT } from './tree-node-direction.js';
+
+
+
 function isRed(node) {
     return !!node && node.color === RED;
 }
@@ -88,7 +162,7 @@ class LlRbTree {
         tree.root.parent = undefined;
         function f(h, datum) {
             if (!h) {
-                return new Node(datum, !tree.replaceDups);
+                return new TreeNode(datum, !tree.replaceDups);
             }
             let c = tree.compare(datum, h.datum);
             if (c === 0) {
@@ -467,5 +541,8 @@ function fixUp(h) {
     }
     return h;
 }
-export { LlRbTree };
-//# sourceMappingURL=index.js.map
+
+
+FloLlRbTree = __webpack_exports__;
+/******/ })()
+;
