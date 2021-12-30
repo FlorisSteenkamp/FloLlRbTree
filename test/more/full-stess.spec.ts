@@ -1,8 +1,8 @@
 import { assert, expect } from 'chai';
 import { describe } from 'mocha';
 import { squares } from 'squares-rng';
-import { compare } from './helpers/compare.js';
-import { LlRbTree } from '../src/index.js';
+import { compare } from '../helpers/compare.js';
+import { LlRbTree } from '../../src/index.js';
 
 
 describe('Full stress test', function() {
