@@ -14,52 +14,28 @@ function isRed<T>(node: Node<T> | null): boolean {
 
 
 class LlRbTree<T> {
-	// @ts-ignore - it is definitely set in the constructor
-	private replaceDups: boolean;
-	// @ts-ignore - it is definitely set in the constructor
-	private compare: ((a: T, b: T) => number) | ((a: T, b: T[]) => number);
-	// @ts-ignore - it is definitely set in the constructor
 	public root: Node<T> | null;
+
 
 	/** 
 	 * @param compare a comparator function
-	 * @param data an initial array of data
-	 * @param replaceDups if `true` then if a duplicate is inserted (as per the 
-	 * equivalence relation induced by the compare function) then replace it;
-	 * if `false` then instead keep an array of values at the relevant node
+	 * @param duplicatesAllowed defaults to `true`; if `false` then if a 
+	 * duplicate is inserted (as per the equivalence relation induced by the 
+	 * compare function) then replace it; if `true` then instead still insert 
+	 * it (so there can be multiple nodes with the same value in the tree)
+	 * @param data an optional initial array of data
 	 */	
 	constructor(
-			compare: (a: T, b: T) => number, 
-			data?: T[], 
-			replaceDups = true) {
+			public compare: (a: T, b: T) => number, 
+			private duplicatesAllowed = true, 
+			data?: T[]) {
 				
-		const tree = this;
-
-		tree.setComparator(compare, replaceDups);	
-		tree.replaceDups = replaceDups;
-		
-		tree.root = null;
+		this.root = null;
 		
 		if (!data) { return; }
 		
-		for (let datum of data) {
-			tree.insert(datum);
-		}
-	}
-
-
-	/**
-	 * Destructively sets the tree compare. This function can be used for for 
-	 * e.g.the Bentley Ottmann algorithm. 
-	 */
-	public setComparator(
-			compare: (a: T, b: T) => number,
-			replaceDups: boolean): void {
-
-		if (replaceDups) {
-			this.compare = compare;	
-		} else {
-			this.compare = (a: T, b: T[]) => compare(a, b[0]);
+		for (const datum of data) {
+			this.insert(datum);
 		}
 	}
 
@@ -68,20 +44,18 @@ class LlRbTree<T> {
 
 
 	/**
-	 * Find and returns the node in the tree with the given datum using the tree 
-	 * compare function. Returns `undefined` if the node was not found.
+	 * Find and returns the (first) node in the tree with the given datum using 
+	 * the tree compare function. Returns `undefined` if the node was not found.
 	 */
 	public find(datum: T): Node<T> | undefined {
 		const tree = this;
 
 		let node = this.root;
 		while (node) {
-			let c = (tree.compare as (a: T, b: T) => number)(datum, node.datum as T);
-			if (c === 0) { 
-				return node;
-			} else {
-				node = node[c > 0 ? RIGHT : LEFT];
-			}
+			const c = tree.compare(datum, node.datum);
+			if (c === 0) { return node; }
+				
+			node = node[c > 0 ? RIGHT : LEFT];
 		}
 
 		return undefined;
@@ -92,19 +66,19 @@ class LlRbTree<T> {
 	 * Returns an ordered (by the tree compare function) array of data as 
 	 * contained in the nodes of the tree by doing an in order traversal.
 	 */
-	public toArrayInOrder(): T[] | T[][] {
-		let nodes: T[] = [];
+	public toArrayInOrder(): T[] {
+		const values: T[] = [];
 		f(this.root);
 		
 		function f(node: Node<T> | null): void {
 			if (!node) { return; }
 
 			f(node[LEFT]);
-			nodes.push(node.datum as T);
+			values.push(node.datum);
 			f(node[RIGHT]);
 		}
 
-		return nodes;
+		return values;
 	}
 
 
@@ -119,18 +93,21 @@ class LlRbTree<T> {
 		
 		function f(h: Node<T> | null, datum: T): Node<T> {
 			if (!h) {
-				return new Node(datum, !tree.replaceDups);
+				return new Node(datum);
 			}
 			
-			let c = (tree.compare as (a: T, b: T) => number)(datum, h.datum as T);
+			let c = tree.compare(datum, h.datum as T);
 			if (c === 0) {
-				if (tree.replaceDups) {
+				if (!tree.duplicatesAllowed) {
 					h.datum = datum;
 				} else {
-					(h.datum as T[]).push(datum as T);
+					/// (h.datum as T[]).push(datum as T);
+					c = 1;
 				}
-			} else {
-				let dir = c > 0 ? RIGHT : LEFT;
+			} 
+			
+			if (c !== 0) {
+				const dir = c > 0 ? RIGHT : LEFT;
 				h[dir] = f(h[dir], datum);
 				h[dir]!.parent = h;
 			}
@@ -157,14 +134,13 @@ class LlRbTree<T> {
 	/**
 	 * Removes an item from the tree based on the given datum.
 	 * 
-	 * * **precondition**: the datum must exist in the tree
-	 * 
 	 * @param datum 
 	 * @param all if the datum is an array, remove all
 	 */
 	public remove(datum: T, all = true): void {
 		const tree = this;
-		// if (!tree.root) { return; }
+		if (tree.root === null) { return; }
+
 		tree.root = f(tree.root!, datum);
 		if (tree.root) { 
 			tree.root.color = BLACK;
@@ -172,18 +148,11 @@ class LlRbTree<T> {
 		}
 		
 		function f(h: Node<T>, datum: T) {
-			let c = (tree.compare as (a: T, b: T) => number)(datum, h.datum as T);
-			
-			if (!tree.replaceDups && c === 0 && !all && (h.datum as T[]).length > 1) {
-				removeFromArray(datum, (h.datum as T[]));
-				return h;
-			}
-
+			let c = tree.compare(datum, h.datum);
 			
 			if (c < 0 && !h[LEFT] || c > 0 && !h[RIGHT]) {
 				return h;
 			}
-			
 			
 			if (c < 0) {
 				if (!isRed(h[LEFT]) && 
@@ -199,11 +168,7 @@ class LlRbTree<T> {
 			
 			if (isRed(h[LEFT])) {
 				h = rotate(RIGHT, h);
-				c = (tree.compare as (a: T, b: T) => number)(datum, h.datum as T);
-				if (!tree.replaceDups && c === 0 && !all && (h.datum as T[]).length > 1) {
-					removeFromArray(datum, (h.datum as T[]));
-					return h;
-				}
+				c = tree.compare(datum, h.datum);
 			}
 			
 			if (c === 0 && !h[RIGHT]) {
@@ -213,11 +178,7 @@ class LlRbTree<T> {
 			if (!isRed(h[RIGHT]) && 
 				!isRed(h[RIGHT]![LEFT])) {
 				h = moveRedRight(h);
-				c = (tree.compare as (a: T, b: T) => number)(datum, h.datum as T);
-				if (!tree.replaceDups && c === 0 && !all && (h.datum as T[]).length > 1) {
-					removeFromArray(datum, (h.datum as T[]));
-					return h;
-				}
+				c = tree.compare(datum, h.datum as T);
 			}
 			
 			if (c === 0) {
@@ -247,12 +208,12 @@ class LlRbTree<T> {
 	public findBounds(datum: T): (Node<T> | undefined)[] {
 		const tree = this;
 		let node = tree.root;
-		let bounds: (Node<T> | undefined)[] = [undefined, undefined];
+		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
 		if (node === null) { return bounds; }
 		
 		while (node) {
-			const c = (tree.compare as (a: T, b: T) => number)(datum, node.datum as T);
+			const c = tree.compare(datum, node.datum);
 			if (c >= 0) { 
 				bounds[0] = node;
 			} else {
@@ -281,9 +242,9 @@ class LlRbTree<T> {
 	 */
 	public findBoundsExcl(datum: T): (Node<T> | undefined)[] {
 		const tree = this;
-		let node = tree.root;
+		const node = tree.root;
 
-		let bounds: (Node<T> | undefined)[] = [undefined, undefined];
+		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
 		if (node === null) { return bounds; }
 		
@@ -291,7 +252,7 @@ class LlRbTree<T> {
 		
 		function f(node: Node<T>) {
 			while (node) {
-				let c = (tree.compare as (a: T, b: T) => number)(datum, node.datum as T);
+				const c = tree.compare(datum, node.datum);
 
 				if (c === 0) {
 					// Search on both sides
@@ -320,12 +281,12 @@ class LlRbTree<T> {
 	 */
 	public findAllInOrder(datum: T): Node<T>[] {
 		const tree = this;
-		let nodes: Node<T>[] = [];
+		const nodes: Node<T>[] = [];
 		f(tree.root!);
 		
 		function f(node: Node<T> | null) {
 			while (node) {
-				let c = (tree.compare as (a: T, b: T) => number)(datum, node.datum as T);
+				const c = tree.compare(datum, node.datum);
 
 				if (c === 0) { 
 					f(node[LEFT]!);
@@ -375,7 +336,7 @@ class LlRbTree<T> {
 	 * 
 	 * @param node
 	 */
-	public min(node?: Node<T> | null | undefined): T|T[] | undefined {
+	public min(node?: Node<T> | null | undefined): T | undefined {
 		if (node === undefined) { 
 			node = this.root;
 		};
@@ -397,7 +358,7 @@ class LlRbTree<T> {
 	 * 
 	 * @param node
 	 */
-	public max(node?: Node<T> | null | undefined): T|T[] | undefined {
+	public max(node?: Node<T> | null | undefined): T | undefined {
 		if (node === undefined) { 
 			node = this.root;
 		};
@@ -418,7 +379,7 @@ class LlRbTree<T> {
  * @internal
  */
 function removeFromArray(elem: any, arr: any[]): void {
-	let index = arr.indexOf(elem);
+	const index = arr.indexOf(elem);
 
 	if (index !== -1) {
         arr.splice(index, 1);
@@ -432,16 +393,15 @@ function removeFromArray(elem: any, arr: any[]): void {
  * Destructively rotates the given node, say h, in the 
  * given direction as far as tree rotations go.
  * 
- * @param dir `true` -> right, `false` -> left
+ * @param dir
  * @param h
  * 
  * @internal
  */
 function rotate<T>(dir: Dir, h: Node<T>): Node<T> {
-	const otherDir = dir ? LEFT : RIGHT;
-	const x = h[otherDir]!;
+	const x = h[-dir as Dir]!;
 	
-	h[otherDir] = x[dir];
+	h[-dir as Dir] = x[dir];
 	if (x[dir]) { x[dir]!.parent = h; }
 	x[dir] = h;
 	h.parent = x;
@@ -474,17 +434,6 @@ function removeMin<T>(h: Node<T>): Node<T> | null {
 
 
 /**
- * @param color 
- * 
- * @internal
- */
-function flipColor(color: Color): Color {
-	// return color === RED ? BLACK : RED;
-	return (color + RED)%2 as Color;
-}
-
-
-/**
  * Destructively flips the color of the given node and both
  * it's childrens' colors. 
  * 
@@ -493,9 +442,9 @@ function flipColor(color: Color): Color {
  * @internal
  */
 function flipColors<T>(h: Node<T>): void {
-	h.color = flipColor(h.color);
-	h[LEFT ]!.color = flipColor(h[LEFT ]!.color);
-	h[RIGHT]!.color = flipColor(h[RIGHT]!.color);
+	h.color = -h.color as Color;
+	h[LEFT ]!.color = -(h[LEFT ]!.color) as Color;
+	h[RIGHT]!.color = -(h[RIGHT]!.color) as Color;
 }
 
 
@@ -507,7 +456,7 @@ function flipColors<T>(h: Node<T>): void {
 function moveRedLeft<T>(h: Node<T>): Node<T> {
 	flipColors(h);
 	if (isRed(h[RIGHT]![LEFT])) {
-		let a = rotate(RIGHT, h[RIGHT]!);
+		const a = rotate(RIGHT, h[RIGHT]!);
 		h[RIGHT] = a;
 		a.parent = h;
 		h = rotate(LEFT, h);

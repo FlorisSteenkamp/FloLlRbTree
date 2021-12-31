@@ -11,7 +11,7 @@ describe('Full stress test', function() {
         const tree = new LlRbTree(compare);
         const arr: number[] = [];
 
-        const N = 10_000;
+        const N = 5_000;
 
         for (let i=0; i<N; i++) {
             tree.insert(squares(i));
@@ -20,7 +20,7 @@ describe('Full stress test', function() {
 
         let treeArr: number[];
         
-        treeArr = tree.toArrayInOrder() as number[];
+        treeArr = tree.toArrayInOrder();
         arr.sort((a,b) => a - b);
         expect(treeArr).to.eql(arr);
 
@@ -33,11 +33,11 @@ describe('Full stress test', function() {
             }
         }
 
-        treeArr = tree.toArrayInOrder() as number[];
+        treeArr = tree.toArrayInOrder();
         arr.sort((a,b) => a - b);
         expect(treeArr).to.eql(arr);
 
-        expect(treeArr.length).to.eql(6678);
+        expect(treeArr.length).to.eql(3325);
     });
 });
 

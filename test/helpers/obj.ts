@@ -1,7 +1,7 @@
 
 interface Obj {
     val: number, 
-    name: string 
+    name?: string 
 }
 
 

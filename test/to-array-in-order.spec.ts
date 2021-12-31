@@ -13,7 +13,7 @@ describe('toArrayInOrder', function() {
             expect(tree.toArrayInOrder()).to.eql([]);
         }
         {
-            const tree = new LlRbTree(compare, [7,6,5,4,3,1,2]);
+            const tree = new LlRbTree(compare, true, [7,6,5,4,3,1,2]);
             expect(tree.toArrayInOrder()).to.eql([1,2,3,4,5,6,7]);
         }
     });

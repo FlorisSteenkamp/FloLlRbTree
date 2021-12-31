@@ -1,21 +1,17 @@
 import { RED, type Color } from './tree-node-color.js';
+import { LEFT, RIGHT, type Dir } from './tree-node-direction.js';
 
 
 /**
  * Red Black Tree node.
  */
 class TreeNode<T> {
-	public datum: T | T[];
 	public color: Color;
 	public parent: TreeNode<T> | undefined;
-	[key: number]: TreeNode<T> | null;
+	"-1": TreeNode<T> | null;
+	"1": TreeNode<T> | null;
 
-	constructor(datum: T, asArray?: boolean) {
-		if (asArray) {
-			this.datum = [datum];
-		} else {
-			this.datum = datum;
-		}
+	constructor(public datum: T) {
 		this.color = RED;
 	}
 }

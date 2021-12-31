@@ -59,9 +59,9 @@ const iR = {
 describe('Special cases', function() {
     it('it should pass some special cases',
 	function() {
-        let tree = new LlRbTree(compare, [initialInterval]);
+        let tree = new LlRbTree(compare, false, [initialInterval]);
         
-        const interval = tree.max() as Interval;
+        const interval = tree.max();
 
         tree.remove(interval);
         tree.insert(iL);

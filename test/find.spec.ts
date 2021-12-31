@@ -11,13 +11,13 @@ describe('find', function() {
 	function() {
         {
             const tree = new LlRbTree(compareObjs);
-            const itemNode = tree.find({ val: 2 } as Obj);
+            const itemNode = tree.find({ val: 2 });
             expect(itemNode).to.be.undefined;
             insert1to7Objs(tree);
-            const item1 = tree.find({ val: 2 } as Obj)!.datum;
-            expect((item1 as Obj).val).to.eql(2);
+            const item1 = tree.find({ val: 2 })!.datum;
+            expect((item1).val).to.eql(2);
             const item2 = tree.find({ val: 2, name: 'apple pear' })!.datum;
-            expect((item2 as Obj).val).to.eql(2);
+            expect((item2).val).to.eql(2);
         }
     });
 });

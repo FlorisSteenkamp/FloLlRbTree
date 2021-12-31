@@ -11,27 +11,32 @@ describe('remove', function() {
 	function() {
         {
             const tree = new LlRbTree(compareObjs);
-            // const itemNode = expect((tree.remove( as Obj[]){ val: 2 } as Obj)).to.throw;
+
+            expect(tree.remove({ val: 112 })).to.not.throw;
+
             insert1to7Objs(tree);
-            tree.remove({ val: 2 } as Obj);
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([1,/*2,*/3,4,5,6,7]);
+            tree.remove({ val: 2 });
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([1,/*2,*/3,3,4,5,6,7]);
             tree.remove({ val: 5, name: 'apple pear' });
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([1,/*2,*/3,4/*,5*/,6,7]);
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([1,/*2,*/3,3,4/*,5*/,6,7]);
+
+            expect(tree.remove({ val: 112 })).to.not.throw;
 
             tree.remove({ val: 1, name: 'apple pear' });
             tree.remove({ val: 3, name: 'apple pear' });
+            tree.remove({ val: 3, name: 'apple pear' });
             tree.remove({ val: 4, name: 'apple pear' });
             tree.remove({ val: 6, name: 'apple pear' });
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([7]);
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([7]);
 
             tree.remove({ val: 7, name: 'apple pear' });
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([]);
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([]);
 
             tree.insert({ val: 7, name: 'apple pear' });
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([7]);
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([7]);
 
             tree.remove({ val: 7, name: 'pear apple' });
-            expect((tree.toArrayInOrder() as Obj[]).map(o => o.val)).to.eql([]);
+            expect((tree.toArrayInOrder()).map(o => o.val)).to.eql([]);
 
             expect(tree.root).to.be.null;
         }
