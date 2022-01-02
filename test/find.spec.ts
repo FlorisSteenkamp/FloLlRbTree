@@ -4,6 +4,8 @@ import { compareObjs } from './helpers/compare-objs.js';
 import { LlRbTree } from '../src/index.js';
 import { insert1to7Objs } from './helpers/insert-1-to-7-objs.js';
 import { type Obj } from './helpers/obj.js';
+import { treeToString } from './helpers/tree-to-str.js';
+import { nodeObjToString } from './helpers/node-obj-to-string.js';
 
 
 describe('find', function() {
@@ -18,6 +20,10 @@ describe('find', function() {
             expect((item1).val).to.eql(2);
             const item2 = tree.find({ val: 2, name: 'apple pear' })!.datum;
             expect((item2).val).to.eql(2);
+
+            const item3 = tree.find({ val: 6, name: 'apple pear' })!.datum;
+            expect((item3).val).to.eql(6);
+            // treeToString(tree, nodeObjToString);//?
         }
     });
 });

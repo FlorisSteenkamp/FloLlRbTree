@@ -10,6 +10,10 @@ describe('findBounds', function() {
     it('it should find bounds for some items in the tree', 
 	function() {
         const tree = new LlRbTree(compare);
+        {
+            const bounds = tree.findBounds(4).map(toDatum);
+            expect(bounds).to.eql([undefined,undefined]);
+        }
         insert1to7(tree);
         {
             const bounds = tree.findBounds(4).map(toDatum);

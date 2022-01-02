@@ -1,8 +1,25 @@
-import { TreeNode as Node } from './tree-node.js';
+declare const LEFT = -1;
+declare const RIGHT = 1;
+declare const BLACK = 1;
+declare const RED = 0;
+declare type Color = 0 | 1;
+/**
+ * Red Black Tree node.
+ */
+declare class Node<T> {
+    datum: T;
+    color: Color;
+    parent: Node<T> | undefined;
+    extras?: T[];
+    "-1": Node<T> | undefined;
+    "1": Node<T> | undefined;
+    constructor(datum: T);
+}
+declare function isRed<T>(node: Node<T> | undefined): boolean;
 declare class LlRbTree<T> {
     compare: (a: T, b: T) => number;
-    private duplicatesAllowed;
-    root: Node<T> | null;
+    duplicatesAllowed: boolean;
+    root: Node<T> | undefined;
     /**
      * @param compare a comparator function
      * @param duplicatesAllowed defaults to `true`; if `false` then if a
@@ -23,6 +40,7 @@ declare class LlRbTree<T> {
      * contained in the nodes of the tree by doing an in order traversal.
      */
     toArrayInOrder(): T[];
+    insertMulti(data: T[]): void;
     /**
      * Inserts a node with the given datum into the tree.
      */
@@ -31,7 +49,7 @@ declare class LlRbTree<T> {
      * Removes an item from the tree based on the given datum.
      *
      * @param datum
-     * @param all if the datum is an array, remove all
+     * @param all defaults to `true`; if `true` and duplicates exist, remove all
      */
     remove(datum: T, all?: boolean): void;
     /**
@@ -61,13 +79,17 @@ declare class LlRbTree<T> {
      */
     findBoundsExcl(datum: T): (Node<T> | undefined)[];
     /**
+     * Returns an array of all matching data found.
      *
+     * If duplicates are not allowed it's better to just use `find`.
+     *
+     * @param datum
      */
-    findAllInOrder(datum: T): Node<T>[];
+    findAll(datum: T): T[];
     /** @internal */
     private getMinOrMaxNode;
-    getMinNode: (node?: Node<T> | null | undefined) => Node<T> | undefined;
-    getMaxNode: (node?: Node<T> | null | undefined) => Node<T> | undefined;
+    getMinNode: (node?: Node<T> | undefined | undefined) => Node<T> | undefined;
+    getMaxNode: (node?: Node<T> | undefined | undefined) => Node<T> | undefined;
     /**
      * Returns the minimum value in the tree starting at the given node. If the
      * tree is empty, `undefined` will be returned.
@@ -77,7 +99,7 @@ declare class LlRbTree<T> {
      *
      * @param node
      */
-    min(node?: Node<T> | null | undefined): T | undefined;
+    min(node?: Node<T> | undefined | undefined): T | undefined;
     /**
      * Returns the maximum value in the tree starting at the given node. If the
      * tree is empty, `undefined` will be returned.
@@ -87,6 +109,6 @@ declare class LlRbTree<T> {
      *
      * @param node
      */
-    max(node?: Node<T> | null | undefined): T | undefined;
+    max(node?: Node<T> | undefined | undefined): T | undefined;
 }
-export { LlRbTree };
+export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed };

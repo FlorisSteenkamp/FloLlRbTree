@@ -2,9 +2,19 @@
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
-import { TreeNode as Node } from './tree-node.js';
-import { RED, BLACK } from './tree-node-color.js';
-import { LEFT, RIGHT } from './tree-node-direction.js';
+const LEFT = -1;
+const RIGHT = 1;
+const BLACK = 1;
+const RED = 0;
+/**
+ * Red Black Tree node.
+ */
+class Node {
+    constructor(datum) {
+        this.datum = datum;
+        this.color = RED;
+    }
+}
 function isRed(node) {
     return !!node && node.color === RED;
 }
@@ -22,7 +32,7 @@ class LlRbTree {
         this.duplicatesAllowed = duplicatesAllowed;
         this.getMinNode = this.getMinOrMaxNode(LEFT);
         this.getMaxNode = this.getMinOrMaxNode(RIGHT);
-        this.root = null;
+        this.root = undefined;
         if (!data) {
             return;
         }
@@ -60,9 +70,18 @@ class LlRbTree {
             }
             f(node[LEFT]);
             values.push(node.datum);
+            if (node.extras !== undefined) {
+                values.push(...node.extras);
+            }
             f(node[RIGHT]);
         }
         return values;
+    }
+    insertMulti(data) {
+        const tree = this;
+        for (let datum of data) {
+            tree.insert(datum);
+        }
     }
     /**
      * Inserts a node with the given datum into the tree.
@@ -73,17 +92,21 @@ class LlRbTree {
         tree.root.color = BLACK;
         tree.root.parent = undefined;
         function f(h, datum) {
-            if (!h) {
+            if (h === undefined) {
                 return new Node(datum);
             }
             let c = tree.compare(datum, h.datum);
             if (c === 0) {
-                if (!tree.duplicatesAllowed) {
-                    h.datum = datum;
+                if (tree.duplicatesAllowed) {
+                    if (h.extras === undefined) {
+                        h.extras = [datum];
+                    }
+                    else {
+                        h.extras.push(datum);
+                    }
                 }
                 else {
-                    /// (h.datum as T[]).push(datum as T);
-                    c = 1;
+                    h.datum = datum; // replace old value
                 }
             }
             if (c !== 0) {
@@ -91,16 +114,13 @@ class LlRbTree {
                 h[dir] = f(h[dir], datum);
                 h[dir].parent = h;
             }
-            if (isRed(h[RIGHT]) &&
-                !isRed(h[LEFT])) {
+            if (isRed(h[RIGHT]) && !isRed(h[LEFT])) {
                 h = rotate(LEFT, h);
             }
-            if (isRed(h[LEFT]) &&
-                isRed(h[LEFT][LEFT])) {
+            if (isRed(h[LEFT]) && isRed(h[LEFT][LEFT])) {
                 h = rotate(RIGHT, h);
             }
-            if (isRed(h[LEFT]) &&
-                isRed(h[RIGHT])) {
+            if (isRed(h[LEFT]) && isRed(h[RIGHT])) {
                 flipColors(h);
             }
             return h;
@@ -110,11 +130,11 @@ class LlRbTree {
      * Removes an item from the tree based on the given datum.
      *
      * @param datum
-     * @param all if the datum is an array, remove all
+     * @param all defaults to `true`; if `true` and duplicates exist, remove all
      */
     remove(datum, all = true) {
         const tree = this;
-        if (tree.root === null) {
+        if (tree.root === undefined) {
             return;
         }
         tree.root = f(tree.root, datum);
@@ -124,8 +144,8 @@ class LlRbTree {
         }
         function f(h, datum) {
             let c = tree.compare(datum, h.datum);
-            if (c < 0 && !h[LEFT] || c > 0 && !h[RIGHT]) {
-                return h;
+            if ((c < 0 && !h[LEFT]) || (c > 0 && !h[RIGHT])) {
+                return h; // end reached - no match
             }
             if (c < 0) {
                 if (!isRed(h[LEFT]) &&
@@ -143,7 +163,14 @@ class LlRbTree {
                 c = tree.compare(datum, h.datum);
             }
             if (c === 0 && !h[RIGHT]) {
-                return null;
+                if (tree.duplicatesAllowed && !all && h.extras !== undefined) {
+                    h.extras.pop();
+                    if (h.extras.length === 0) {
+                        h.extras = undefined;
+                    }
+                    return h;
+                }
+                return undefined;
             }
             if (!isRed(h[RIGHT]) &&
                 !isRed(h[RIGHT][LEFT])) {
@@ -151,8 +178,25 @@ class LlRbTree {
                 c = tree.compare(datum, h.datum);
             }
             if (c === 0) {
-                h.datum = tree.min(h[RIGHT]);
-                h[RIGHT] = removeMin(h[RIGHT]);
+                if (tree.duplicatesAllowed) {
+                    if (!all && h.extras !== undefined) {
+                        h.extras.pop();
+                        if (h.extras.length === 0) {
+                            h.extras = undefined;
+                        }
+                        h[RIGHT] = f(h[RIGHT], datum);
+                    }
+                    else {
+                        const minNode = tree.getMinNode(h[RIGHT]);
+                        h.datum = minNode?.datum;
+                        h.extras = minNode?.extras;
+                        h[RIGHT] = removeMin(h[RIGHT]);
+                    }
+                }
+                else {
+                    h.datum = tree.getMinNode(h[RIGHT])?.datum;
+                    h[RIGHT] = removeMin(h[RIGHT]);
+                }
             }
             else {
                 h[RIGHT] = f(h[RIGHT], datum);
@@ -178,7 +222,7 @@ class LlRbTree {
         const tree = this;
         let node = tree.root;
         const bounds = [undefined, undefined];
-        if (node === null) {
+        if (node === undefined) {
             return bounds;
         }
         while (node) {
@@ -210,7 +254,7 @@ class LlRbTree {
         const tree = this;
         const node = tree.root;
         const bounds = [undefined, undefined];
-        if (node === null) {
+        if (node === undefined) {
             return bounds;
         }
         f(node);
@@ -235,25 +279,26 @@ class LlRbTree {
         return bounds;
     }
     /**
+     * Returns an array of all matching data found.
      *
+     * If duplicates are not allowed it's better to just use `find`.
+     *
+     * @param datum
      */
-    findAllInOrder(datum) {
+    findAll(datum) {
         const tree = this;
-        const nodes = [];
-        f(tree.root);
-        function f(node) {
-            while (node) {
-                const c = tree.compare(datum, node.datum);
-                if (c === 0) {
-                    f(node[LEFT]);
-                    nodes.push(node);
-                    f(node[RIGHT]);
-                    return;
-                }
-                node = node[c > 0 ? RIGHT : LEFT];
+        let node = this.root;
+        while (node) {
+            const c = tree.compare(datum, node.datum);
+            if (c === 0) {
+                return [
+                    node.datum,
+                    ...(node.extras ? node.extras : [])
+                ];
             }
+            node = node[c > 0 ? RIGHT : LEFT];
         }
-        return nodes;
+        return [];
     }
     /** @internal */
     getMinOrMaxNode(dir) {
@@ -313,18 +358,6 @@ class LlRbTree {
     }
 }
 /**
- * Removes the datum from the tuple using ===.
- * Note this function uses === and not the compare function!
- *
- * @internal
- */
-function removeFromArray(elem, arr) {
-    const index = arr.indexOf(elem);
-    if (index !== -1) {
-        arr.splice(index, 1);
-    }
-}
-/**
  * Returns the node that is at the top after the rotation.
  *
  * Destructively rotates the given node, say h, in the
@@ -354,7 +387,7 @@ function rotate(dir, h) {
  */
 function removeMin(h) {
     if (!h[LEFT]) {
-        return null;
+        return undefined;
     }
     if (!isRed(h[LEFT]) &&
         !isRed(h[LEFT][LEFT])) {
@@ -375,9 +408,9 @@ function removeMin(h) {
  * @internal
  */
 function flipColors(h) {
-    h.color = -h.color;
-    h[LEFT].color = -(h[LEFT].color);
-    h[RIGHT].color = -(h[RIGHT].color);
+    h.color = (h.color + 1) % 2;
+    h[LEFT].color = (h[LEFT].color + 1) % 2;
+    h[RIGHT].color = (h[RIGHT].color + 1) % 2;
 }
 /**
  * @param h
@@ -421,16 +454,14 @@ function fixUp(h) {
     if (isRed(h[RIGHT])) {
         h = rotate(LEFT, h);
     }
-    if (isRed(h[LEFT]) &&
-        isRed(h[LEFT][LEFT])) {
+    if (isRed(h[LEFT]) && isRed(h[LEFT][LEFT])) {
         h = rotate(RIGHT, h);
     }
     // Split 4-nodes.
-    if (isRed(h[LEFT]) &&
-        isRed(h[RIGHT])) {
+    if (isRed(h[LEFT]) && isRed(h[RIGHT])) {
         flipColors(h);
     }
     return h;
 }
-export { LlRbTree };
+export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed };
 //# sourceMappingURL=index.js.map

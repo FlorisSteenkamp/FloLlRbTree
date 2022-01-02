@@ -266,7 +266,9 @@ class LlRbTree<T> {
 		let node = tree.root;
 		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
-		if (node === undefined) { return bounds; }
+		if (node === undefined) { 
+			return bounds; 
+		}
 		
 		while (node) {
 			const c = tree.compare(datum, node.datum);
@@ -302,7 +304,9 @@ class LlRbTree<T> {
 
 		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
-		if (node === undefined) { return bounds; }
+		if (node === undefined) { 
+			return bounds; 
+		}
 		
 		f(node);
 		
@@ -333,30 +337,29 @@ class LlRbTree<T> {
 
 
 	/**
+	 * Returns an array of all matching data found.
 	 * 
+	 * If duplicates are not allowed it's better to just use `find`.
+	 * 
+	 * @param datum 
 	 */
-	public findAllInOrder(datum: T): Node<T>[] {
+	public findAll(datum: T): T[] {
 		const tree = this;
-		const nodes: Node<T>[] = [];
-		f(tree.root!);
-		
-		function f(node: Node<T> | undefined) {
-			while (node) {
-				const c = tree.compare(datum, node.datum);
 
-				if (c === 0) { 
-					f(node[LEFT]!);
-					nodes.push(node);
-					f(node[RIGHT]!);
-					
-					return;
-				} 
-
-				node = node[c > 0 ? RIGHT : LEFT];
+		let node = this.root;
+		while (node) {
+			const c = tree.compare(datum, node.datum);
+			if (c === 0) { 
+				return [
+					node.datum, 
+					...(node.extras ? node.extras : [])
+				];
 			}
+				
+			node = node[c > 0 ? RIGHT : LEFT];
 		}
 
-		return nodes;
+		return [];
 	}
 
 

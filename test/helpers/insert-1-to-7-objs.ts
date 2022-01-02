@@ -1,6 +1,5 @@
 import { LlRbTree } from "../../src/index.js";
 import { vals1to7Objs } from "./vals-1-to-7-objs.js";
-import { vals1to7 } from './vals-1-to-7.js';
 import { type Obj } from './obj.js';
 
 

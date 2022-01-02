@@ -10,6 +10,10 @@ describe('findBoundsExcl', function() {
     it('it should find bounds (exlcluding the given datum) for some items in the tree', 
 	function() {
         const tree = new LlRbTree(compare);
+        {
+            const bounds = tree.findBoundsExcl(4).map(toDatum);
+            expect(bounds).to.eql([undefined,undefined]);
+        }
         insert1to7(tree);
         {
             const bounds = tree.findBoundsExcl(4).map(toDatum);
