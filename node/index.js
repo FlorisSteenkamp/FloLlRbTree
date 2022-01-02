@@ -11,53 +11,39 @@ function isRed(node) {
 class LlRbTree {
     /**
      * @param compare a comparator function
-     * @param data an initial array of data
-     * @param replaceDups if `true` then if a duplicate is inserted (as per the
-     * equivalence relation induced by the compare function) then replace it;
-     * if `false` then instead keep an array of values at the relevant node
+     * @param duplicatesAllowed defaults to `true`; if `false` then if a
+     * duplicate is inserted (as per the equivalence relation induced by the
+     * compare function) then replace it; if `true` then instead still insert
+     * it (so there can be multiple nodes with the same value in the tree)
+     * @param data an optional initial array of data
      */
-    constructor(compare, data, replaceDups = true) {
+    constructor(compare, duplicatesAllowed = true, data) {
+        this.compare = compare;
+        this.duplicatesAllowed = duplicatesAllowed;
         this.getMinNode = this.getMinOrMaxNode(LEFT);
         this.getMaxNode = this.getMinOrMaxNode(RIGHT);
-        const tree = this;
-        tree.setComparator(compare, replaceDups);
-        tree.replaceDups = replaceDups;
-        tree.root = null;
+        this.root = null;
         if (!data) {
             return;
         }
-        for (let datum of data) {
-            tree.insert(datum);
-        }
-    }
-    /**
-     * Destructively sets the tree compare. This function can be used for for
-     * e.g.the Bentley Ottmann algorithm.
-     */
-    setComparator(compare, replaceDups) {
-        if (replaceDups) {
-            this.compare = compare;
-        }
-        else {
-            this.compare = (a, b) => compare(a, b[0]);
+        for (const datum of data) {
+            this.insert(datum);
         }
     }
     isEmpty() { return !this.root; }
     /**
-     * Find and returns the node in the tree with the given datum using the tree
-     * compare function. Returns `undefined` if the node was not found.
+     * Find and returns the (first) node in the tree with the given datum using
+     * the tree compare function. Returns `undefined` if the node was not found.
      */
     find(datum) {
         const tree = this;
         let node = this.root;
         while (node) {
-            let c = tree.compare(datum, node.datum);
+            const c = tree.compare(datum, node.datum);
             if (c === 0) {
                 return node;
             }
-            else {
-                node = node[c > 0 ? RIGHT : LEFT];
-            }
+            node = node[c > 0 ? RIGHT : LEFT];
         }
         return undefined;
     }
@@ -66,17 +52,17 @@ class LlRbTree {
      * contained in the nodes of the tree by doing an in order traversal.
      */
     toArrayInOrder() {
-        let nodes = [];
+        const values = [];
         f(this.root);
         function f(node) {
             if (!node) {
                 return;
             }
             f(node[LEFT]);
-            nodes.push(node.datum);
+            values.push(node.datum);
             f(node[RIGHT]);
         }
-        return nodes;
+        return values;
     }
     /**
      * Inserts a node with the given datum into the tree.
@@ -88,19 +74,20 @@ class LlRbTree {
         tree.root.parent = undefined;
         function f(h, datum) {
             if (!h) {
-                return new Node(datum, !tree.replaceDups);
+                return new Node(datum);
             }
             let c = tree.compare(datum, h.datum);
             if (c === 0) {
-                if (tree.replaceDups) {
+                if (!tree.duplicatesAllowed) {
                     h.datum = datum;
                 }
                 else {
-                    h.datum.push(datum);
+                    /// (h.datum as T[]).push(datum as T);
+                    c = 1;
                 }
             }
-            else {
-                let dir = c > 0 ? RIGHT : LEFT;
+            if (c !== 0) {
+                const dir = c > 0 ? RIGHT : LEFT;
                 h[dir] = f(h[dir], datum);
                 h[dir].parent = h;
             }
@@ -122,14 +109,14 @@ class LlRbTree {
     /**
      * Removes an item from the tree based on the given datum.
      *
-     * * **precondition**: the datum must exist in the tree
-     *
      * @param datum
      * @param all if the datum is an array, remove all
      */
     remove(datum, all = true) {
         const tree = this;
-        // if (!tree.root) { return; }
+        if (tree.root === null) {
+            return;
+        }
         tree.root = f(tree.root, datum);
         if (tree.root) {
             tree.root.color = BLACK;
@@ -137,10 +124,6 @@ class LlRbTree {
         }
         function f(h, datum) {
             let c = tree.compare(datum, h.datum);
-            if (!tree.replaceDups && c === 0 && !all && h.datum.length > 1) {
-                removeFromArray(datum, h.datum);
-                return h;
-            }
             if (c < 0 && !h[LEFT] || c > 0 && !h[RIGHT]) {
                 return h;
             }
@@ -158,10 +141,6 @@ class LlRbTree {
             if (isRed(h[LEFT])) {
                 h = rotate(RIGHT, h);
                 c = tree.compare(datum, h.datum);
-                if (!tree.replaceDups && c === 0 && !all && h.datum.length > 1) {
-                    removeFromArray(datum, h.datum);
-                    return h;
-                }
             }
             if (c === 0 && !h[RIGHT]) {
                 return null;
@@ -170,10 +149,6 @@ class LlRbTree {
                 !isRed(h[RIGHT][LEFT])) {
                 h = moveRedRight(h);
                 c = tree.compare(datum, h.datum);
-                if (!tree.replaceDups && c === 0 && !all && h.datum.length > 1) {
-                    removeFromArray(datum, h.datum);
-                    return h;
-                }
             }
             if (c === 0) {
                 h.datum = tree.min(h[RIGHT]);
@@ -202,7 +177,7 @@ class LlRbTree {
     findBounds(datum) {
         const tree = this;
         let node = tree.root;
-        let bounds = [undefined, undefined];
+        const bounds = [undefined, undefined];
         if (node === null) {
             return bounds;
         }
@@ -233,15 +208,15 @@ class LlRbTree {
      */
     findBoundsExcl(datum) {
         const tree = this;
-        let node = tree.root;
-        let bounds = [undefined, undefined];
+        const node = tree.root;
+        const bounds = [undefined, undefined];
         if (node === null) {
             return bounds;
         }
         f(node);
         function f(node) {
             while (node) {
-                let c = tree.compare(datum, node.datum);
+                const c = tree.compare(datum, node.datum);
                 if (c === 0) {
                     // Search on both sides
                     f(node[LEFT]);
@@ -264,11 +239,11 @@ class LlRbTree {
      */
     findAllInOrder(datum) {
         const tree = this;
-        let nodes = [];
+        const nodes = [];
         f(tree.root);
         function f(node) {
             while (node) {
-                let c = tree.compare(datum, node.datum);
+                const c = tree.compare(datum, node.datum);
                 if (c === 0) {
                     f(node[LEFT]);
                     nodes.push(node);
@@ -344,7 +319,7 @@ class LlRbTree {
  * @internal
  */
 function removeFromArray(elem, arr) {
-    let index = arr.indexOf(elem);
+    const index = arr.indexOf(elem);
     if (index !== -1) {
         arr.splice(index, 1);
     }
@@ -355,15 +330,14 @@ function removeFromArray(elem, arr) {
  * Destructively rotates the given node, say h, in the
  * given direction as far as tree rotations go.
  *
- * @param dir `true` -> right, `false` -> left
+ * @param dir
  * @param h
  *
  * @internal
  */
 function rotate(dir, h) {
-    const otherDir = dir ? LEFT : RIGHT;
-    const x = h[otherDir];
-    h[otherDir] = x[dir];
+    const x = h[-dir];
+    h[-dir] = x[dir];
     if (x[dir]) {
         x[dir].parent = h;
     }
@@ -393,15 +367,6 @@ function removeMin(h) {
     return fixUp(h);
 }
 /**
- * @param color
- *
- * @internal
- */
-function flipColor(color) {
-    // return color === RED ? BLACK : RED;
-    return (color + RED) % 2;
-}
-/**
  * Destructively flips the color of the given node and both
  * it's childrens' colors.
  *
@@ -410,9 +375,9 @@ function flipColor(color) {
  * @internal
  */
 function flipColors(h) {
-    h.color = flipColor(h.color);
-    h[LEFT].color = flipColor(h[LEFT].color);
-    h[RIGHT].color = flipColor(h[RIGHT].color);
+    h.color = -h.color;
+    h[LEFT].color = -(h[LEFT].color);
+    h[RIGHT].color = -(h[RIGHT].color);
 }
 /**
  * @param h
@@ -422,7 +387,7 @@ function flipColors(h) {
 function moveRedLeft(h) {
     flipColors(h);
     if (isRed(h[RIGHT][LEFT])) {
-        let a = rotate(RIGHT, h[RIGHT]);
+        const a = rotate(RIGHT, h[RIGHT]);
         h[RIGHT] = a;
         a.parent = h;
         h = rotate(LEFT, h);

@@ -3,10 +3,11 @@ import { type Color } from './tree-node-color.js';
  * Red Black Tree node.
  */
 declare class TreeNode<T> {
-    datum: T | T[];
+    datum: T;
     color: Color;
     parent: TreeNode<T> | undefined;
-    [key: number]: TreeNode<T> | null;
-    constructor(datum: T, asArray?: boolean);
+    "-1": TreeNode<T> | null;
+    "1": TreeNode<T> | null;
+    constructor(datum: T);
 }
 export { TreeNode };

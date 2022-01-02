@@ -56,7 +56,7 @@ describe('new', function() {
                 7,7,7,7,7,7,7,7,7,7,7
             ]);
 
-            for (let i=0; i<9; i++) { tree.remove(7); }
+            for (let i=0; i<9; i++) { tree.remove(7, false); }
             expect((tree.toArrayInOrder())).to.eql([
                 1,
                 2,

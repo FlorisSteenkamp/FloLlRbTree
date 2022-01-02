@@ -3,18 +3,36 @@
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
 
-import { TreeNode as Node }  from './tree-node.js';
-import { RED, BLACK, type Color } from './tree-node-color.js';
-import { LEFT, RIGHT, type Dir } from './tree-node-direction.js';
+const LEFT = -1;
+const RIGHT = 1;
+type Dir = -1|1;
+
+const BLACK = 1;
+const RED = 0;
+type Color = 0|1;
 
 
-function isRed<T>(node: Node<T> | null): boolean {
+/**
+ * Red Black Tree node.
+ */
+ class Node<T> {
+	public color: Color = RED;
+	public parent: Node<T> | undefined;
+	public extras?: T[];
+	"-1": Node<T> | undefined;
+	"1" : Node<T> | undefined;
+
+	constructor(public datum: T) {}
+}
+
+
+function isRed<T>(node: Node<T> | undefined): boolean {
 	return !!node && node.color === RED;
 }
 
 
 class LlRbTree<T> {
-	public root: Node<T> | null;
+	public root: Node<T> | undefined;
 
 
 	/** 
@@ -27,10 +45,10 @@ class LlRbTree<T> {
 	 */	
 	constructor(
 			public compare: (a: T, b: T) => number, 
-			private duplicatesAllowed = true, 
+			public duplicatesAllowed = true, 
 			data?: T[]) {
 				
-		this.root = null;
+		this.root = undefined;
 		
 		if (!data) { return; }
 		
@@ -70,15 +88,26 @@ class LlRbTree<T> {
 		const values: T[] = [];
 		f(this.root);
 		
-		function f(node: Node<T> | null): void {
+		function f(node: Node<T> | undefined): void {
 			if (!node) { return; }
 
 			f(node[LEFT]);
 			values.push(node.datum);
+			if (node.extras !== undefined) {
+				values.push(...node.extras);
+			}
 			f(node[RIGHT]);
 		}
 
 		return values;
+	}
+
+
+	public insertMulti(data: T[]): void {
+		const tree = this;
+		for (let datum of data) {
+			tree.insert(datum);
+		}
 	}
 
 
@@ -91,18 +120,22 @@ class LlRbTree<T> {
 		tree.root.color = BLACK;
 		tree.root.parent = undefined;
 		
-		function f(h: Node<T> | null, datum: T): Node<T> {
-			if (!h) {
+		function f(h: Node<T> | undefined, datum: T): Node<T> {
+			if (h === undefined) {
 				return new Node(datum);
 			}
 			
-			let c = tree.compare(datum, h.datum as T);
+			let c = tree.compare(datum, h.datum);
+
 			if (c === 0) {
-				if (!tree.duplicatesAllowed) {
-					h.datum = datum;
+				if (tree.duplicatesAllowed) {
+					if (h.extras === undefined) {
+						h.extras = [datum];
+					} else {
+						h.extras.push(datum);
+					}
 				} else {
-					/// (h.datum as T[]).push(datum as T);
-					c = 1;
+					h.datum = datum;  // replace old value
 				}
 			} 
 			
@@ -112,17 +145,13 @@ class LlRbTree<T> {
 				h[dir]!.parent = h;
 			}
 			
-			if (isRed(h[RIGHT]) && 
-			    !isRed(h[LEFT])) {
+			if (isRed(h[RIGHT]) && !isRed(h[LEFT])) {
 				h = rotate(LEFT, h);
 			}
-			if (isRed(h[LEFT]) && 
-				isRed(h[LEFT]![LEFT])) {
+			if (isRed(h[LEFT]) && isRed(h[LEFT]![LEFT])) {
 				h = rotate(RIGHT, h);
 			}
-
-			if (isRed(h[LEFT]) && 
-				isRed(h[RIGHT])) {
+			if (isRed(h[LEFT]) && isRed(h[RIGHT])) {
 				flipColors(h);
 			}
 			
@@ -135,23 +164,24 @@ class LlRbTree<T> {
 	 * Removes an item from the tree based on the given datum.
 	 * 
 	 * @param datum 
-	 * @param all if the datum is an array, remove all
+	 * @param all defaults to `true`; if `true` and duplicates exist, remove all
 	 */
 	public remove(datum: T, all = true): void {
 		const tree = this;
-		if (tree.root === null) { return; }
 
-		tree.root = f(tree.root!, datum);
+		if (tree.root === undefined) { return; }
+
+		tree.root = f(tree.root, datum);
 		if (tree.root) { 
 			tree.root.color = BLACK;
 			tree.root.parent = undefined;
 		}
-		
+
 		function f(h: Node<T>, datum: T) {
 			let c = tree.compare(datum, h.datum);
 			
-			if (c < 0 && !h[LEFT] || c > 0 && !h[RIGHT]) {
-				return h;
+			if ((c < 0 && !h[LEFT]) || (c > 0 && !h[RIGHT])) {
+				return h;  // end reached - no match
 			}
 			
 			if (c < 0) {
@@ -160,7 +190,9 @@ class LlRbTree<T> {
 					h = moveRedLeft(h);
 				}
 				h[LEFT] = f(h[LEFT]!, datum);
-				if (h[LEFT]) { h[LEFT]!.parent = h; }
+				if (h[LEFT]) { 
+					h[LEFT]!.parent = h; 
+				}
 				
 				return fixUp(h);
 			} 
@@ -172,18 +204,42 @@ class LlRbTree<T> {
 			}
 			
 			if (c === 0 && !h[RIGHT]) {
-				return null;
+				if (tree.duplicatesAllowed && !all && h.extras !== undefined) {
+					h.extras.pop();
+					if (h.extras.length === 0) { 
+						h.extras = undefined; 
+					}
+
+					return h;
+				}
+				
+				return undefined;
 			}
 			
 			if (!isRed(h[RIGHT]) && 
 				!isRed(h[RIGHT]![LEFT])) {
 				h = moveRedRight(h);
-				c = tree.compare(datum, h.datum as T);
+				c = tree.compare(datum, h.datum);
 			}
 			
 			if (c === 0) {
-				h.datum = tree.min(h[RIGHT])!;  
-				h[RIGHT] = removeMin(h[RIGHT]!);
+				if (tree.duplicatesAllowed) {
+					if (!all && h.extras !== undefined) {
+						h.extras.pop();
+						if (h.extras.length === 0) { 
+							h.extras = undefined; 
+						}
+						h[RIGHT] = f(h[RIGHT]!, datum);
+					} else {
+						const minNode = tree.getMinNode(h[RIGHT]);
+						h.datum = minNode?.datum!;
+						h.extras = minNode?.extras!;
+						h[RIGHT] = removeMin(h[RIGHT]!);
+					}
+				} else {
+					h.datum = tree.getMinNode(h[RIGHT])?.datum!;
+					h[RIGHT] = removeMin(h[RIGHT]!);
+				}
 			} else {
 				h[RIGHT] = f(h[RIGHT]!, datum);
 			}
@@ -210,7 +266,7 @@ class LlRbTree<T> {
 		let node = tree.root;
 		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
-		if (node === null) { return bounds; }
+		if (node === undefined) { return bounds; }
 		
 		while (node) {
 			const c = tree.compare(datum, node.datum);
@@ -246,7 +302,7 @@ class LlRbTree<T> {
 
 		const bounds: (Node<T> | undefined)[] = [undefined, undefined];
 		
-		if (node === null) { return bounds; }
+		if (node === undefined) { return bounds; }
 		
 		f(node);
 		
@@ -284,7 +340,7 @@ class LlRbTree<T> {
 		const nodes: Node<T>[] = [];
 		f(tree.root!);
 		
-		function f(node: Node<T> | null) {
+		function f(node: Node<T> | undefined) {
 			while (node) {
 				const c = tree.compare(datum, node.datum);
 
@@ -305,8 +361,8 @@ class LlRbTree<T> {
 
 
 	/** @internal */
-	private getMinOrMaxNode(dir: Dir): (node?: Node<T> | null | undefined) => Node<T> | undefined {
-		return (node: Node<T> | null | undefined): Node<T> | undefined => {
+	private getMinOrMaxNode(dir: Dir): (node?: Node<T> | undefined | undefined) => Node<T> | undefined {
+		return (node: Node<T> | undefined | undefined): Node<T> | undefined => {
 			if (node === undefined) { 
 				node = this.root;
 			};
@@ -336,8 +392,8 @@ class LlRbTree<T> {
 	 * 
 	 * @param node
 	 */
-	public min(node?: Node<T> | null | undefined): T | undefined {
-		if (node === undefined) { 
+	public min(node?: Node<T> | undefined | undefined): T | undefined {
+		if (node === undefined) {
 			node = this.root;
 		};
 		const minNode = this.getMinNode(node);
@@ -358,7 +414,7 @@ class LlRbTree<T> {
 	 * 
 	 * @param node
 	 */
-	public max(node?: Node<T> | null | undefined): T | undefined {
+	public max(node?: Node<T> | undefined | undefined): T | undefined {
 		if (node === undefined) { 
 			node = this.root;
 		};
@@ -368,21 +424,6 @@ class LlRbTree<T> {
 		}
 		
 		return undefined;
-	}
-}
-
-
-/**
- * Removes the datum from the tuple using ===.
- * Note this function uses === and not the compare function! 
- * 
- * @internal
- */
-function removeFromArray(elem: any, arr: any[]): void {
-	const index = arr.indexOf(elem);
-
-	if (index !== -1) {
-        arr.splice(index, 1);
 	}
 }
 
@@ -418,9 +459,9 @@ function rotate<T>(dir: Dir, h: Node<T>): Node<T> {
  * 
  * @internal
  */
-function removeMin<T>(h: Node<T>): Node<T> | null {
+function removeMin<T>(h: Node<T>): Node<T> | undefined {
 	if (!h[LEFT]) {
-		return null;
+		return undefined;
 	}
 	if (!isRed(h[LEFT]) && 
 		!isRed(h[LEFT]![LEFT])) {
@@ -442,9 +483,9 @@ function removeMin<T>(h: Node<T>): Node<T> | null {
  * @internal
  */
 function flipColors<T>(h: Node<T>): void {
-	h.color = -h.color as Color;
-	h[LEFT ]!.color = -(h[LEFT ]!.color) as Color;
-	h[RIGHT]!.color = -(h[RIGHT]!.color) as Color;
+	h.color = (h.color + 1)%2 as Color;
+	h[LEFT ]!.color = (h[LEFT ]!.color + 1)%2 as Color;
+	h[RIGHT]!.color = (h[RIGHT]!.color + 1)%2 as Color;
 }
 
 
@@ -497,14 +538,12 @@ function fixUp<T>(h: Node<T>): Node<T> {
 		h = rotate(LEFT, h);
 	}
 
-	if (isRed(h[LEFT]) && 
-		isRed(h[LEFT]![LEFT])) {
+	if (isRed(h[LEFT]) && isRed(h[LEFT]![LEFT])) {
 		h = rotate(RIGHT, h);
 	}
 
 	// Split 4-nodes.
-	if (isRed(h[LEFT]) && 
-		isRed(h[RIGHT])) {
+	if (isRed(h[LEFT]) && isRed(h[RIGHT])) {
 		flipColors(h);
 	}
 
@@ -512,4 +551,4 @@ function fixUp<T>(h: Node<T>): Node<T> {
 }
 
 
-export { LlRbTree }
+export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed }

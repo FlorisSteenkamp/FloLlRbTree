@@ -1,40 +1,34 @@
 import { TreeNode as Node } from './tree-node.js';
 declare class LlRbTree<T> {
-    private replaceDups;
-    private compare;
+    compare: (a: T, b: T) => number;
+    private duplicatesAllowed;
     root: Node<T> | null;
     /**
      * @param compare a comparator function
-     * @param data an initial array of data
-     * @param replaceDups if `true` then if a duplicate is inserted (as per the
-     * equivalence relation induced by the compare function) then replace it;
-     * if `false` then instead keep an array of values at the relevant node
+     * @param duplicatesAllowed defaults to `true`; if `false` then if a
+     * duplicate is inserted (as per the equivalence relation induced by the
+     * compare function) then replace it; if `true` then instead still insert
+     * it (so there can be multiple nodes with the same value in the tree)
+     * @param data an optional initial array of data
      */
-    constructor(compare: (a: T, b: T) => number, data?: T[], replaceDups?: boolean);
-    /**
-     * Destructively sets the tree compare. This function can be used for for
-     * e.g.the Bentley Ottmann algorithm.
-     */
-    setComparator(compare: (a: T, b: T) => number, replaceDups: boolean): void;
+    constructor(compare: (a: T, b: T) => number, duplicatesAllowed?: boolean, data?: T[]);
     isEmpty(): boolean;
     /**
-     * Find and returns the node in the tree with the given datum using the tree
-     * compare function. Returns `undefined` if the node was not found.
+     * Find and returns the (first) node in the tree with the given datum using
+     * the tree compare function. Returns `undefined` if the node was not found.
      */
     find(datum: T): Node<T> | undefined;
     /**
      * Returns an ordered (by the tree compare function) array of data as
      * contained in the nodes of the tree by doing an in order traversal.
      */
-    toArrayInOrder(): T[] | T[][];
+    toArrayInOrder(): T[];
     /**
      * Inserts a node with the given datum into the tree.
      */
     insert(datum: T): void;
     /**
      * Removes an item from the tree based on the given datum.
-     *
-     * * **precondition**: the datum must exist in the tree
      *
      * @param datum
      * @param all if the datum is an array, remove all
@@ -83,7 +77,7 @@ declare class LlRbTree<T> {
      *
      * @param node
      */
-    min(node?: Node<T> | null | undefined): T | T[] | undefined;
+    min(node?: Node<T> | null | undefined): T | undefined;
     /**
      * Returns the maximum value in the tree starting at the given node. If the
      * tree is empty, `undefined` will be returned.
@@ -93,6 +87,6 @@ declare class LlRbTree<T> {
      *
      * @param node
      */
-    max(node?: Node<T> | null | undefined): T | T[] | undefined;
+    max(node?: Node<T> | null | undefined): T | undefined;
 }
 export { LlRbTree };

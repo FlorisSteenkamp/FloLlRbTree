@@ -1,7 +1,8 @@
 import { assert, expect } from 'chai';
 import { describe } from 'mocha';
-import { squares } from 'squares-rng';
 import { LlRbTree } from '../../src/index.js';
+import { countNodes } from '../helpers/count-nodes.js';
+import { countValues } from '../helpers/count-values.js';
 
 const max = Math.max;
 
@@ -59,17 +60,20 @@ const iR = {
 describe('Special cases', function() {
     it('it should pass some special cases',
 	function() {
-        let tree = new LlRbTree(compare, false, [initialInterval]);
+        let tree = new LlRbTree(compare, true, [initialInterval]);
         
-        const interval = tree.max();
+        const interval = tree.max()!;
 
         tree.remove(interval);
         tree.insert(iL);
+        tree.insert(iL);
+        tree.insert(iL);
         tree.insert(iR);
 
-        const m = tree.max();
+        const nodeCount = countNodes(tree);
+        const valCount = countValues(tree);
 
-        // expect().to.eql();
+        expect(nodeCount).to.eql(2);
+        expect(valCount).to.eql(4);
     });
 });
-
