@@ -1,7 +1,7 @@
 // Modified from https://www.geeksforgeeks.org/binary-tree-string-brackets/
 
-import { LlRbTree, Node, LEFT, RIGHT, isRed } from "../../src/index.js";
-import { nodeToString } from '../helpers/node-to-string.js';
+import { LlRbTree, Node, LEFT, RIGHT } from "./index.js";
+import { nodeToString } from './node-to-string.js';
 
 
 /** 
@@ -11,13 +11,13 @@ function treeToString<T>(
         tree: LlRbTree<T>,
         drawFunc: (node: Node<T>) => string = nodeToString as any): string {
 
-    const root = tree.root;
+    const root = tree.root!;
     let treeStr = '';
     f(root);
 
     return treeStr;
 
-    function f(node: Node<T>): string {
+    function f(node: Node<T> | undefined): void {
         if (node === undefined) { 
             return; 
         }
@@ -29,14 +29,14 @@ function treeToString<T>(
             return;
         }
 
-        // for left subtree
+        // left subtree
         if (node[LEFT] !== undefined) {
             treeStr += '(';
             f(node[LEFT]);
             treeStr += ')';
         }
 
-        // only if right child is present to avoid extra parenthesis
+        // right subtree
         if (node[RIGHT] !== undefined) {
             treeStr += '[';
             f(node[RIGHT]);

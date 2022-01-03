@@ -1,4 +1,4 @@
-import { Node, isRed } from "../../src/index.js";
+import { Node, isRed } from "./index.js";
 
 
 function nodeToString(node: Node<number>) { 

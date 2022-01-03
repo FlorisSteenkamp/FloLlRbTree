@@ -3,6 +3,10 @@
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
 
+import { nodeToString } from './node-to-string.js';
+import { treeToString } from './tree-to-string.js';
+
+
 const LEFT = -1;
 const RIGHT = 1;
 type Dir = -1|1;
@@ -33,6 +37,15 @@ function isRed<T>(node: Node<T> | undefined): boolean {
 
 class LlRbTree<T> {
 	public root: Node<T> | undefined;
+	/** 
+	 * The number of nodes in the tree (that equals the number of values in the
+	 * tree not counting duplicates).
+	 */
+	public nodeCount: number;  
+	/** 
+	 * The number of values in the tree.
+	 */
+	public valueCount: number;
 
 
 	/** 
@@ -49,6 +62,8 @@ class LlRbTree<T> {
 			data?: T[]) {
 				
 		this.root = undefined;
+		this.nodeCount = 0;
+		this.valueCount = 0;
 		
 		if (!data) { return; }
 		
@@ -122,6 +137,8 @@ class LlRbTree<T> {
 		
 		function f(h: Node<T> | undefined, datum: T): Node<T> {
 			if (h === undefined) {
+				tree.valueCount++;
+				tree.nodeCount++;
 				return new Node(datum);
 			}
 			
@@ -129,6 +146,7 @@ class LlRbTree<T> {
 
 			if (c === 0) {
 				if (tree.duplicatesAllowed) {
+					tree.valueCount++;
 					if (h.extras === undefined) {
 						h.extras = [datum];
 					} else {
@@ -161,21 +179,25 @@ class LlRbTree<T> {
 
 
 	/**
-	 * Removes an item from the tree based on the given datum.
+	 * Removes an item from the tree based on the given datum and returns `true`
+	 * if an item was removed, `false` otherwise.
 	 * 
 	 * @param datum 
 	 * @param all defaults to `true`; if `true` and duplicates exist, remove all
 	 */
-	public remove(datum: T, all = true): void {
+	public remove(datum: T, all = true): boolean {
 		const tree = this;
 
-		if (tree.root === undefined) { return; }
+		if (tree.root === undefined) { return false; }
 
+		let removed = false;
 		tree.root = f(tree.root, datum);
 		if (tree.root) { 
 			tree.root.color = BLACK;
 			tree.root.parent = undefined;
 		}
+
+		return removed;
 
 		function f(h: Node<T>, datum: T) {
 			let c = tree.compare(datum, h.datum);
@@ -206,24 +228,33 @@ class LlRbTree<T> {
 			if (c === 0 && !h[RIGHT]) {
 				if (tree.duplicatesAllowed && !all && h.extras !== undefined) {
 					h.extras.pop();
+					removed = true;
+					tree.valueCount--;
 					if (h.extras.length === 0) { 
 						h.extras = undefined; 
 					}
-
+					
 					return h;
 				}
+
+				removed = true;
+				tree.nodeCount--;
+				tree.valueCount--;
 				
 				return undefined;
 			}
 			
 			if (!isRed(h[RIGHT]) && 
 				!isRed(h[RIGHT]![LEFT])) {
+
 				h = moveRedRight(h);
 				c = tree.compare(datum, h.datum);
 			}
 			
 			if (c === 0) {
 				if (tree.duplicatesAllowed) {
+					removed = true;
+					tree.valueCount--;
 					if (!all && h.extras !== undefined) {
 						h.extras.pop();
 						if (h.extras.length === 0) { 
@@ -235,10 +266,12 @@ class LlRbTree<T> {
 						h.datum = minNode?.datum!;
 						h.extras = minNode?.extras!;
 						h[RIGHT] = removeMin(h[RIGHT]!);
+						tree.nodeCount--;
 					}
 				} else {
 					h.datum = tree.getMinNode(h[RIGHT])?.datum!;
 					h[RIGHT] = removeMin(h[RIGHT]!);
+					tree.nodeCount--;
 				}
 			} else {
 				h[RIGHT] = f(h[RIGHT]!, datum);
@@ -554,4 +587,8 @@ function fixUp<T>(h: Node<T>): Node<T> {
 }
 
 
-export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed }
+export { 
+	LlRbTree, Node, 
+	LEFT, RIGHT, RED, BLACK, 
+	isRed, nodeToString, treeToString 
+}
