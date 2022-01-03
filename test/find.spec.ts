@@ -4,8 +4,6 @@ import { compareObjs } from './helpers/compare-objs.js';
 import { LlRbTree } from '../src/index.js';
 import { insert1to7Objs } from './helpers/insert-1-to-7-objs.js';
 import { type Obj } from './helpers/obj.js';
-import { treeToString } from './helpers/tree-to-str.js';
-import { nodeObjToString } from './helpers/node-obj-to-string.js';
 
 
 describe('find', function() {

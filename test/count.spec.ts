@@ -2,13 +2,11 @@ import { assert, expect } from 'chai';
 import { describe } from 'mocha';
 import { squares } from 'squares-rng';
 import { compare } from './helpers/compare.js';
-import { LlRbTree } from '../src/index.js';
-import { isBlackHeightCorrect, isNoRedEdge } from './helpers/constraints.js';
-import { treeToString } from '../src/tree-to-string.js';
+import { LlRbTree, treeToStr } from '../src/index.js';
 import { countValues } from './helpers/count-values.js';
 import { countNodes } from './helpers/count-nodes.js';
-import { nodeObjToString } from './helpers/node-obj-to-string.js';
-import { nodeToString } from '../src/node-to-string.js';
+import { objNodeToStr } from './helpers/obj-node-to-str.js';
+import { numberNodeToStr } from '../src/number-node-to-str.js';
 
 
 describe('Full stress test', function() {
@@ -39,7 +37,8 @@ describe('Full stress test', function() {
                 }
             }
 
-            // tree.toArrayInOrder();//?
+            // treeToString(numberNodeToStr)(tree);
+
 
             let valueCount1: number;
             let valueCount2: number;
@@ -113,7 +112,7 @@ describe('Full stress test', function() {
             nodeCount = countNodes(tree);
             expect(nodeCount).to.eql(tree.nodeCount);
 
-            // treeToString(tree, nodeToString);//?
+            // treeToString(numberNodeToStr)(tree);
 
             for (let i=0; i<N; i++) {
                 const v = squares(i) % 20;

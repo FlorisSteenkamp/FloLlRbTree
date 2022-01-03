@@ -2,9 +2,8 @@ import { assert, expect } from 'chai';
 import { describe } from 'mocha';
 import { squares } from 'squares-rng';
 import { compare } from '../helpers/compare.js';
-import { LlRbTree } from '../../src/index.js';
+import { LlRbTree, numberNodeToStr, treeToStr } from '../../src/index.js';
 import { isBlackHeightCorrect, isNoRedEdge } from '../helpers/constraints.js';
-import { treeToString } from '../helpers/tree-to-str.js';
 
 
 describe('Full stress test', function() {
@@ -57,7 +56,7 @@ describe('Full stress test', function() {
             arr.push(v);
         }
 
-        // treeToString(tree);//?
+        // treeToString(numberNodeToStr)(tree);
         assert(isBlackHeightCorrect(tree), 'tree does not pass black height constraint');
         assert(isNoRedEdge(tree), 'tree does not pass no red edge constraint')
 

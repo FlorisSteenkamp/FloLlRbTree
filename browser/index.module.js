@@ -21,15 +21,22 @@
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "dn": () => (/* binding */ LlRbTree),
-/* harmony export */   "NB": () => (/* binding */ Node),
-/* harmony export */   "RL": () => (/* binding */ LEFT),
-/* harmony export */   "pX": () => (/* binding */ RIGHT),
-/* harmony export */   "hM": () => (/* binding */ RED),
-/* harmony export */   "E5": () => (/* binding */ BLACK),
-/* harmony export */   "xC": () => (/* binding */ isRed)
-/* harmony export */ });
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "E5": () => (/* reexport */ BLACK),
+  "RL": () => (/* reexport */ LEFT),
+  "dn": () => (/* reexport */ LlRbTree),
+  "NB": () => (/* reexport */ Node),
+  "hM": () => (/* reexport */ RED),
+  "pX": () => (/* reexport */ RIGHT),
+  "xC": () => (/* reexport */ isRed),
+  "iK": () => (/* reexport */ nodeToStr),
+  "Wl": () => (/* reexport */ numberNodeToStr),
+  "Qx": () => (/* reexport */ treeToStr)
+});
+
+;// CONCATENATED MODULE: ./src/tree.ts
 // Concise, Destructive, Left Leaning Red Black Tree implementation.
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
@@ -65,6 +72,8 @@ class LlRbTree {
         this.getMinNode = this.getMinOrMaxNode(LEFT);
         this.getMaxNode = this.getMinOrMaxNode(RIGHT);
         this.root = undefined;
+        this.nodeCount = 0;
+        this.valueCount = 0;
         if (!data) {
             return;
         }
@@ -125,11 +134,14 @@ class LlRbTree {
         tree.root.parent = undefined;
         function f(h, datum) {
             if (h === undefined) {
+                tree.valueCount++;
+                tree.nodeCount++;
                 return new Node(datum);
             }
             let c = tree.compare(datum, h.datum);
             if (c === 0) {
                 if (tree.duplicatesAllowed) {
+                    tree.valueCount++;
                     if (h.extras === undefined) {
                         h.extras = [datum];
                     }
@@ -159,7 +171,8 @@ class LlRbTree {
         }
     }
     /**
-     * Removes an item from the tree based on the given datum.
+     * Removes an item from the tree based on the given datum and returns `true`
+     * if an item was removed, `false` otherwise.
      *
      * @param datum
      * @param all defaults to `true`; if `true` and duplicates exist, remove all
@@ -167,13 +180,15 @@ class LlRbTree {
     remove(datum, all = true) {
         const tree = this;
         if (tree.root === undefined) {
-            return;
+            return false;
         }
+        let removed = false;
         tree.root = f(tree.root, datum);
         if (tree.root) {
             tree.root.color = BLACK;
             tree.root.parent = undefined;
         }
+        return removed;
         function f(h, datum) {
             let c = tree.compare(datum, h.datum);
             if ((c < 0 && !h[LEFT]) || (c > 0 && !h[RIGHT])) {
@@ -197,11 +212,16 @@ class LlRbTree {
             if (c === 0 && !h[RIGHT]) {
                 if (tree.duplicatesAllowed && !all && h.extras !== undefined) {
                     h.extras.pop();
+                    removed = true;
+                    tree.valueCount--;
                     if (h.extras.length === 0) {
                         h.extras = undefined;
                     }
                     return h;
                 }
+                removed = true;
+                tree.nodeCount--;
+                tree.valueCount--;
                 return undefined;
             }
             if (!isRed(h[RIGHT]) &&
@@ -211,6 +231,8 @@ class LlRbTree {
             }
             if (c === 0) {
                 if (tree.duplicatesAllowed) {
+                    removed = true;
+                    tree.valueCount--;
                     if (!all && h.extras !== undefined) {
                         h.extras.pop();
                         if (h.extras.length === 0) {
@@ -223,11 +245,13 @@ class LlRbTree {
                         h.datum = minNode?.datum;
                         h.extras = minNode?.extras;
                         h[RIGHT] = removeMin(h[RIGHT]);
+                        tree.nodeCount--;
                     }
                 }
                 else {
                     h.datum = tree.getMinNode(h[RIGHT])?.datum;
                     h[RIGHT] = removeMin(h[RIGHT]);
+                    tree.nodeCount--;
                 }
             }
             else {
@@ -497,6 +521,72 @@ function fixUp(h) {
 }
 
 
+;// CONCATENATED MODULE: ./src/node-to-str.ts
+
+function nodeToStr(valToStr) {
+    return (node) => {
+        let str;
+        if (node.extras !== undefined) {
+            str = `{${[node.datum, ...(node.extras)].map(valToStr)}}`;
+        }
+        else {
+            str = valToStr(node.datum);
+        }
+        return str + (isRed(node) ? '•' : '·');
+    };
+}
+
+
+;// CONCATENATED MODULE: ./src/number-node-to-str.ts
+
+const numberNodeToStr = nodeToStr(t => t.toString());
+
+
+;// CONCATENATED MODULE: ./src/tree-to-string.ts
+// Modified from https://www.geeksforgeeks.org/binary-tree-string-brackets/
+
+/**
+ * Function to construct string from binary tree
+ */
+function treeToStr(nodeToStrFunc) {
+    return (tree) => {
+        const root = tree.root;
+        let treeStr = '';
+        f(root);
+        return treeStr;
+        function f(node) {
+            if (node === undefined) {
+                return;
+            }
+            treeStr += nodeToStrFunc(node);
+            // if leaf node, then return
+            if (node[LEFT] === undefined && node[RIGHT] == undefined) {
+                return;
+            }
+            // left subtree
+            if (node[LEFT] !== undefined) {
+                treeStr += '(';
+                f(node[LEFT]);
+                treeStr += ')';
+            }
+            // right subtree
+            if (node[RIGHT] !== undefined) {
+                treeStr += '[';
+                f(node[RIGHT]);
+                treeStr += ']';
+            }
+        }
+    };
+}
+
+
+;// CONCATENATED MODULE: ./src/index.ts
+
+
+
+
+
+
 var __webpack_exports__BLACK = __webpack_exports__.E5;
 var __webpack_exports__LEFT = __webpack_exports__.RL;
 var __webpack_exports__LlRbTree = __webpack_exports__.dn;
@@ -504,4 +594,7 @@ var __webpack_exports__Node = __webpack_exports__.NB;
 var __webpack_exports__RED = __webpack_exports__.hM;
 var __webpack_exports__RIGHT = __webpack_exports__.pX;
 var __webpack_exports__isRed = __webpack_exports__.xC;
-export { __webpack_exports__BLACK as BLACK, __webpack_exports__LEFT as LEFT, __webpack_exports__LlRbTree as LlRbTree, __webpack_exports__Node as Node, __webpack_exports__RED as RED, __webpack_exports__RIGHT as RIGHT, __webpack_exports__isRed as isRed };
+var __webpack_exports__nodeToStr = __webpack_exports__.iK;
+var __webpack_exports__numberNodeToStr = __webpack_exports__.Wl;
+var __webpack_exports__treeToStr = __webpack_exports__.Qx;
+export { __webpack_exports__BLACK as BLACK, __webpack_exports__LEFT as LEFT, __webpack_exports__LlRbTree as LlRbTree, __webpack_exports__Node as Node, __webpack_exports__RED as RED, __webpack_exports__RIGHT as RIGHT, __webpack_exports__isRed as isRed, __webpack_exports__nodeToStr as nodeToStr, __webpack_exports__numberNodeToStr as numberNodeToStr, __webpack_exports__treeToStr as treeToStr };
