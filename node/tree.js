@@ -132,25 +132,32 @@ class LlRbTree {
         }
     }
     /**
-     * Removes an item from the tree based on the given datum and returns `true`
-     * if an item was removed, `false` otherwise.
+     * Removes an item from the tree based on the given datum and returns the
+     * item that was removed or `undefined` if nothing was removed.
      *
      * @param datum
-     * @param all defaults to `true`; if `true` and duplicates exist, remove all
+     * @param all defaults to `false`; if `true` and duplicates exist, remove all
+     * @param compareStrict if provided then only delete an item if it passes the
+     * strict comparison function, i.e. if `compareStrict(item,node_value) === true`.
      */
-    remove(datum, all = true) {
+    remove(datum, all = false, compareStrict) {
         const tree = this;
         if (tree.root === undefined) {
-            return false;
+            return undefined;
         }
-        let removed = false;
-        tree.root = f(tree.root, datum);
-        if (tree.root) {
+        let removed = undefined;
+        const root = f(tree.root, datum);
+        if (root === null) {
+            return undefined;
+        }
+        tree.root = root;
+        if (tree.root !== undefined) {
             tree.root.color = BLACK;
             tree.root.parent = undefined;
         }
         return removed;
         function f(h, datum) {
+            const theresExtras = tree.duplicatesAllowed && h.extras !== undefined;
             let c = tree.compare(datum, h.datum);
             if ((c < 0 && !h[LEFT]) || (c > 0 && !h[RIGHT])) {
                 return h; // end reached - no match
@@ -160,7 +167,11 @@ class LlRbTree {
                     !isRed(h[LEFT][LEFT])) {
                     h = moveRedLeft(h);
                 }
-                h[LEFT] = f(h[LEFT], datum);
+                const g = f(h[LEFT], datum);
+                if (g === null) {
+                    return null;
+                }
+                h[LEFT] = g;
                 if (h[LEFT]) {
                     h[LEFT].parent = h;
                 }
@@ -171,19 +182,41 @@ class LlRbTree {
                 c = tree.compare(datum, h.datum);
             }
             if (c === 0 && !h[RIGHT]) {
-                if (tree.duplicatesAllowed && !all && h.extras !== undefined) {
-                    h.extras.pop();
-                    removed = true;
-                    tree.valueCount--;
-                    if (h.extras.length === 0) {
-                        h.extras = undefined;
+                if (theresExtras && !all) {
+                    // There are multiple items at this node.
+                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                        removed = h.datum;
+                        h.datum = h.extras.pop();
+                        tree.valueCount--;
+                        if (h.extras.length === 0) {
+                            h.extras = undefined;
+                        }
+                        return h;
                     }
-                    return h;
+                    else {
+                        const extras = h.extras;
+                        for (let i = 0; i < extras.length; i++) {
+                            if (compareStrict(datum, extras[i])) {
+                                removed = extras.splice(i, 1)[0];
+                                tree.valueCount--;
+                                if (extras.length === 0) {
+                                    h.extras = undefined;
+                                }
+                                return h;
+                            }
+                        }
+                        return null;
+                    }
                 }
-                removed = true;
-                tree.nodeCount--;
-                tree.valueCount--;
-                return undefined;
+                if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    removed = h.datum;
+                    tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
+                    tree.nodeCount--;
+                    return undefined;
+                }
+                else {
+                    return null; // no match
+                }
             }
             if (!isRed(h[RIGHT]) &&
                 !isRed(h[RIGHT][LEFT])) {
@@ -191,32 +224,64 @@ class LlRbTree {
                 c = tree.compare(datum, h.datum);
             }
             if (c === 0) {
-                if (tree.duplicatesAllowed) {
-                    removed = true;
-                    tree.valueCount--;
-                    if (!all && h.extras !== undefined) {
-                        h.extras.pop();
+                if (theresExtras && !all) {
+                    // There are multiple items at this node.
+                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                        removed = h.datum;
+                        h.datum = h.extras.pop();
+                        tree.valueCount--;
                         if (h.extras.length === 0) {
                             h.extras = undefined;
                         }
-                        h[RIGHT] = f(h[RIGHT], datum);
+                        //// const g = f(h[RIGHT]!, datum);
+                        // if (g === null) { return null; }
+                        //// h[RIGHT] = g!;
                     }
                     else {
-                        const minNode = tree.getMinNode(h[RIGHT]);
-                        h.datum = minNode?.datum;
-                        h.extras = minNode?.extras;
-                        h[RIGHT] = removeMin(h[RIGHT]);
-                        tree.nodeCount--;
+                        const extras = h.extras;
+                        let found = false;
+                        for (let i = 0; i < extras.length; i++) {
+                            if (compareStrict(datum, extras[i])) {
+                                removed = extras.splice(i, 1)[0];
+                                tree.valueCount--;
+                                if (extras.length === 0) {
+                                    h.extras = undefined;
+                                }
+                                //// const g = f(h[RIGHT]!, extras[i]);
+                                // if (g === null) { return null; }
+                                //// h[RIGHT] = g!;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            return null;
+                        }
                     }
                 }
                 else {
-                    h.datum = tree.getMinNode(h[RIGHT])?.datum;
-                    h[RIGHT] = removeMin(h[RIGHT]);
-                    tree.nodeCount--;
+                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                        tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
+                        removed = h.datum;
+                        const minNode = tree.getMinNode(h[RIGHT]);
+                        h.datum = minNode?.datum;
+                        if (tree.duplicatesAllowed) {
+                            h.extras = minNode?.extras;
+                        }
+                        h[RIGHT] = removeMin(h[RIGHT]);
+                        tree.nodeCount--;
+                    }
+                    else {
+                        return null; // no match
+                    }
                 }
             }
             else {
-                h[RIGHT] = f(h[RIGHT], datum);
+                const g = f(h[RIGHT], datum);
+                if (g === null) {
+                    return null;
+                }
+                h[RIGHT] = g;
             }
             if (h[RIGHT]) {
                 h[RIGHT].parent = h;

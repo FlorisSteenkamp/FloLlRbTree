@@ -55,13 +55,15 @@ declare class LlRbTree<T> {
      */
     insert(datum: T): void;
     /**
-     * Removes an item from the tree based on the given datum and returns `true`
-     * if an item was removed, `false` otherwise.
+     * Removes an item from the tree based on the given datum and returns the
+     * item that was removed or `undefined` if nothing was removed.
      *
      * @param datum
-     * @param all defaults to `true`; if `true` and duplicates exist, remove all
+     * @param all defaults to `false`; if `true` and duplicates exist, remove all
+     * @param compareStrict if provided then only delete an item if it passes the
+     * strict comparison function, i.e. if `compareStrict(item,node_value) === true`.
      */
-    remove(datum: T, all?: boolean): boolean;
+    remove(datum: T, all?: boolean, compareStrict?: (t1: T, t2: T) => boolean): T | undefined;
     /**
      * Returns the two ordered nodes bounding the datum.
      *

@@ -5,6 +5,7 @@ import { LlRbTree } from '../src/index.js';
 import { insert1to7Objs } from './helpers/insert-1-to-7-objs.js';
 import { isBlackHeightCorrect, isNoRedEdge } from './helpers/constraints.js';
 import { vals1to7Objs } from './helpers/vals-1-to-7-objs.js';
+import { countValues } from './helpers/count-values.js';
 
 
 describe('remove', function() {
@@ -67,9 +68,44 @@ describe('remove', function() {
         vals = tree.toArrayInOrder().map(o => o.val);
         expect(vals).to.eql([1,1,2,2,3,3,3,3.5,4,4,5,5,6,6,7,7]);
         
-        tree.remove({ val: 3 });
+        tree.remove({ val: 3 }, true);
         // treeToString(tree, nodeObjToString);
         vals = tree.toArrayInOrder().map(o => o.val);
         expect(vals).to.eql([1,1,2,2,3.5,4,4,5,5,6,6,7,7]);
+    });
+
+    it('it should remove multiple items in the tree based if requested', 
+    function() {
+        const vals = [1,2,3,3,3,3,3,4,5,6].map(v => ({ val: v, name: v.toString() }));
+        const tree = new LlRbTree(compareObjs, true, vals);
+        
+        // const vCount = countValues(tree);
+        expect(tree.toArrayInOrder().map(o => o.val)).to.eql(
+            [1,2,3,3,3,3,3,4,5,6]
+        );
+        tree.remove({ val: 3, name: 'apple' });
+        expect(tree.toArrayInOrder().map(o => o.val)).to.eql(
+            [1,2,3,3,3,3,4,5,6]
+        );
+        tree.remove({ val: 3, name: 'pear' });
+        expect(tree.toArrayInOrder().map(o => o.val)).to.eql(
+            [1,2,3,3,3,4,5,6]
+        );
+
+        tree.remove(
+            { val: 3, name: 'guava' }, false, 
+            (a,b) => (a.val - b.val === 0) && (a.name === b.name)
+        );
+        expect(tree.toArrayInOrder().map(o => o.val)).to.eql(
+            [1,2,3,3,3,4,5,6]  // should not have removed
+        );
+
+        tree.remove(
+            { val: 3, name: '322' }, false, 
+            (a,b) => (a.val - b.val === 0) && (a.name === b.name)
+        );
+        expect(tree.toArrayInOrder().map(o => o.val)).to.eql(
+            [1,2,3,3,3,4,5,6]
+        );
     });
 });
