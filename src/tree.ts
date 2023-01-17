@@ -117,7 +117,7 @@ class LlRbTree<T> {
 
 	public insertMulti(data: T[]): void {
 		const tree = this;
-		for (let datum of data) {
+		for (const datum of data) {
 			tree.insert(datum);
 		}
 	}
@@ -139,7 +139,7 @@ class LlRbTree<T> {
 				return new Node(datum);
 			}
 			
-			let c = tree.compare(datum, h.datum);
+			const c = tree.compare(datum, h.datum);
 
 			if (c === 0) {
 				if (tree.duplicatesAllowed) {
@@ -331,7 +331,9 @@ class LlRbTree<T> {
 						tree.valueCount -= 1 + (theresExtras ? h.extras!.length : 0);
 						removed = h.datum;
 						const minNode = tree.getMinNode(h[RIGHT]);
+						// eslint-disable-next-line
 						h.datum = minNode?.datum!;
+						// eslint-disable-next-line
 						if (tree.duplicatesAllowed) { h.extras = minNode?.extras!; }
 						h[RIGHT] = removeMin(h[RIGHT]!);
 						tree.nodeCount--;
@@ -469,7 +471,7 @@ class LlRbTree<T> {
 		return (node: Node<T> | undefined | undefined): Node<T> | undefined => {
 			if (node === undefined) { 
 				node = this.root;
-			};
+			}
 			if (!node) { 
 				return undefined;
 			}
@@ -483,7 +485,9 @@ class LlRbTree<T> {
 	}
 	
 	
+	// eslint-disable-next-line
 	public getMinNode = this.getMinOrMaxNode(LEFT);
+	// eslint-disable-next-line
 	public getMaxNode = this.getMinOrMaxNode(RIGHT);
 
 
@@ -499,7 +503,7 @@ class LlRbTree<T> {
 	public min(node?: Node<T> | undefined | undefined): T | undefined {
 		if (node === undefined) {
 			node = this.root;
-		};
+		}
 		const minNode = this.getMinNode(node);
 		if (minNode !== undefined) { 
 			return minNode.datum;
@@ -521,7 +525,7 @@ class LlRbTree<T> {
 	public max(node?: Node<T> | undefined | undefined): T | undefined {
 		if (node === undefined) { 
 			node = this.root;
-		};
+		}
 		const maxNode = this.getMaxNode(node);
 		if (maxNode !== undefined) { 
 			return maxNode.datum;

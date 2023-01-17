@@ -30,7 +30,9 @@ class LlRbTree {
     constructor(compare, duplicatesAllowed = true, data) {
         this.compare = compare;
         this.duplicatesAllowed = duplicatesAllowed;
+        // eslint-disable-next-line
         this.getMinNode = this.getMinOrMaxNode(LEFT);
+        // eslint-disable-next-line
         this.getMaxNode = this.getMinOrMaxNode(RIGHT);
         this.root = undefined;
         this.nodeCount = 0;
@@ -81,7 +83,7 @@ class LlRbTree {
     }
     insertMulti(data) {
         const tree = this;
-        for (let datum of data) {
+        for (const datum of data) {
             tree.insert(datum);
         }
     }
@@ -99,7 +101,7 @@ class LlRbTree {
                 tree.nodeCount++;
                 return new Node(datum);
             }
-            let c = tree.compare(datum, h.datum);
+            const c = tree.compare(datum, h.datum);
             if (c === 0) {
                 if (tree.duplicatesAllowed) {
                     tree.valueCount++;
@@ -184,7 +186,8 @@ class LlRbTree {
             if (c === 0 && !h[RIGHT]) {
                 if (theresExtras && !all) {
                     // There are multiple items at this node.
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         removed = h.datum;
                         h.datum = h.extras.pop();
                         tree.valueCount--;
@@ -196,7 +199,7 @@ class LlRbTree {
                     else {
                         const extras = h.extras;
                         for (let i = 0; i < extras.length; i++) {
-                            if (compareStrict(datum, extras[i])) {
+                            if (compareStrict(datum, extras[i]) === true) {
                                 removed = extras.splice(i, 1)[0];
                                 tree.valueCount--;
                                 if (extras.length === 0) {
@@ -208,7 +211,8 @@ class LlRbTree {
                         return null;
                     }
                 }
-                if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                if (compareStrict === undefined ||
+                    (compareStrict(datum, h.datum) === true)) {
                     removed = h.datum;
                     tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
                     tree.nodeCount--;
@@ -226,7 +230,8 @@ class LlRbTree {
             if (c === 0) {
                 if (theresExtras && !all) {
                     // There are multiple items at this node.
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         removed = h.datum;
                         h.datum = h.extras.pop();
                         tree.valueCount--;
@@ -241,7 +246,7 @@ class LlRbTree {
                         const extras = h.extras;
                         let found = false;
                         for (let i = 0; i < extras.length; i++) {
-                            if (compareStrict(datum, extras[i])) {
+                            if (compareStrict(datum, extras[i]) === true) {
                                 removed = extras.splice(i, 1)[0];
                                 tree.valueCount--;
                                 if (extras.length === 0) {
@@ -260,11 +265,14 @@ class LlRbTree {
                     }
                 }
                 else {
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
                         removed = h.datum;
                         const minNode = tree.getMinNode(h[RIGHT]);
+                        // eslint-disable-next-line
                         h.datum = minNode?.datum;
+                        // eslint-disable-next-line
                         if (tree.duplicatesAllowed) {
                             h.extras = minNode?.extras;
                         }
@@ -388,7 +396,6 @@ class LlRbTree {
             if (node === undefined) {
                 node = this.root;
             }
-            ;
             if (!node) {
                 return undefined;
             }
@@ -411,7 +418,6 @@ class LlRbTree {
         if (node === undefined) {
             node = this.root;
         }
-        ;
         const minNode = this.getMinNode(node);
         if (minNode !== undefined) {
             return minNode.datum;
@@ -431,7 +437,6 @@ class LlRbTree {
         if (node === undefined) {
             node = this.root;
         }
-        ;
         const maxNode = this.getMaxNode(node);
         if (maxNode !== undefined) {
             return maxNode.datum;

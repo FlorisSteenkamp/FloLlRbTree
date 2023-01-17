@@ -2,7 +2,7 @@ declare const LEFT = -1;
 declare const RIGHT = 1;
 declare const BLACK = 1;
 declare const RED = 0;
-declare type Color = 0 | 1;
+type Color = 0 | 1;
 /**
  * Red Black Tree node.
  */

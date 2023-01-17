@@ -1,55 +1,39 @@
-var FloLlRbTree;
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	// The require scope
-/******/ 	var __webpack_require__ = {};
-/******/ 	
+/******/ // The require scope
+/******/ var __webpack_require__ = {};
+/******/ 
 /************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
+/******/ /* webpack/runtime/define property getters */
+/******/ (() => {
+/******/ 	// define getter functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
+/******/ 		}
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ (() => {
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ })();
+/******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "BLACK": () => (/* reexport */ BLACK),
-  "LEFT": () => (/* reexport */ LEFT),
-  "LlRbTree": () => (/* reexport */ LlRbTree),
-  "Node": () => (/* reexport */ Node),
-  "RED": () => (/* reexport */ RED),
-  "RIGHT": () => (/* reexport */ RIGHT),
-  "isRed": () => (/* reexport */ isRed),
-  "nodeToStr": () => (/* reexport */ nodeToStr),
-  "numberNodeToStr": () => (/* reexport */ numberNodeToStr),
-  "treeToStr": () => (/* reexport */ treeToStr)
+  "E5": () => (/* reexport */ BLACK),
+  "RL": () => (/* reexport */ LEFT),
+  "dn": () => (/* reexport */ LlRbTree),
+  "NB": () => (/* reexport */ Node),
+  "hM": () => (/* reexport */ RED),
+  "pX": () => (/* reexport */ RIGHT),
+  "xC": () => (/* reexport */ isRed),
+  "iK": () => (/* reexport */ nodeToStr),
+  "Wl": () => (/* reexport */ numberNodeToStr),
+  "Qx": () => (/* reexport */ treeToStr)
 });
 
 ;// CONCATENATED MODULE: ./src/tree.ts
@@ -85,7 +69,9 @@ class LlRbTree {
     constructor(compare, duplicatesAllowed = true, data) {
         this.compare = compare;
         this.duplicatesAllowed = duplicatesAllowed;
+        // eslint-disable-next-line
         this.getMinNode = this.getMinOrMaxNode(LEFT);
+        // eslint-disable-next-line
         this.getMaxNode = this.getMinOrMaxNode(RIGHT);
         this.root = undefined;
         this.nodeCount = 0;
@@ -136,7 +122,7 @@ class LlRbTree {
     }
     insertMulti(data) {
         const tree = this;
-        for (let datum of data) {
+        for (const datum of data) {
             tree.insert(datum);
         }
     }
@@ -154,7 +140,7 @@ class LlRbTree {
                 tree.nodeCount++;
                 return new Node(datum);
             }
-            let c = tree.compare(datum, h.datum);
+            const c = tree.compare(datum, h.datum);
             if (c === 0) {
                 if (tree.duplicatesAllowed) {
                     tree.valueCount++;
@@ -239,7 +225,8 @@ class LlRbTree {
             if (c === 0 && !h[RIGHT]) {
                 if (theresExtras && !all) {
                     // There are multiple items at this node.
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         removed = h.datum;
                         h.datum = h.extras.pop();
                         tree.valueCount--;
@@ -251,7 +238,7 @@ class LlRbTree {
                     else {
                         const extras = h.extras;
                         for (let i = 0; i < extras.length; i++) {
-                            if (compareStrict(datum, extras[i])) {
+                            if (compareStrict(datum, extras[i]) === true) {
                                 removed = extras.splice(i, 1)[0];
                                 tree.valueCount--;
                                 if (extras.length === 0) {
@@ -263,7 +250,8 @@ class LlRbTree {
                         return null;
                     }
                 }
-                if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                if (compareStrict === undefined ||
+                    (compareStrict(datum, h.datum) === true)) {
                     removed = h.datum;
                     tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
                     tree.nodeCount--;
@@ -281,7 +269,8 @@ class LlRbTree {
             if (c === 0) {
                 if (theresExtras && !all) {
                     // There are multiple items at this node.
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         removed = h.datum;
                         h.datum = h.extras.pop();
                         tree.valueCount--;
@@ -296,7 +285,7 @@ class LlRbTree {
                         const extras = h.extras;
                         let found = false;
                         for (let i = 0; i < extras.length; i++) {
-                            if (compareStrict(datum, extras[i])) {
+                            if (compareStrict(datum, extras[i]) === true) {
                                 removed = extras.splice(i, 1)[0];
                                 tree.valueCount--;
                                 if (extras.length === 0) {
@@ -315,11 +304,14 @@ class LlRbTree {
                     }
                 }
                 else {
-                    if (compareStrict === undefined || compareStrict(datum, h.datum)) {
+                    if (compareStrict === undefined ||
+                        (compareStrict(datum, h.datum) === true)) {
                         tree.valueCount -= 1 + (theresExtras ? h.extras.length : 0);
                         removed = h.datum;
                         const minNode = tree.getMinNode(h[RIGHT]);
+                        // eslint-disable-next-line
                         h.datum = minNode?.datum;
+                        // eslint-disable-next-line
                         if (tree.duplicatesAllowed) {
                             h.extras = minNode?.extras;
                         }
@@ -443,7 +435,6 @@ class LlRbTree {
             if (node === undefined) {
                 node = this.root;
             }
-            ;
             if (!node) {
                 return undefined;
             }
@@ -466,7 +457,6 @@ class LlRbTree {
         if (node === undefined) {
             node = this.root;
         }
-        ;
         const minNode = this.getMinNode(node);
         if (minNode !== undefined) {
             return minNode.datum;
@@ -486,7 +476,6 @@ class LlRbTree {
         if (node === undefined) {
             node = this.root;
         }
-        ;
         const maxNode = this.getMaxNode(node);
         if (maxNode !== undefined) {
             return maxNode.datum;
@@ -668,6 +657,14 @@ function treeToStr(nodeToStrFunc) {
 
 
 
-FloLlRbTree = __webpack_exports__;
-/******/ })()
-;
+var __webpack_exports__BLACK = __webpack_exports__.E5;
+var __webpack_exports__LEFT = __webpack_exports__.RL;
+var __webpack_exports__LlRbTree = __webpack_exports__.dn;
+var __webpack_exports__Node = __webpack_exports__.NB;
+var __webpack_exports__RED = __webpack_exports__.hM;
+var __webpack_exports__RIGHT = __webpack_exports__.pX;
+var __webpack_exports__isRed = __webpack_exports__.xC;
+var __webpack_exports__nodeToStr = __webpack_exports__.iK;
+var __webpack_exports__numberNodeToStr = __webpack_exports__.Wl;
+var __webpack_exports__treeToStr = __webpack_exports__.Qx;
+export { __webpack_exports__BLACK as BLACK, __webpack_exports__LEFT as LEFT, __webpack_exports__LlRbTree as LlRbTree, __webpack_exports__Node as Node, __webpack_exports__RED as RED, __webpack_exports__RIGHT as RIGHT, __webpack_exports__isRed as isRed, __webpack_exports__nodeToStr as nodeToStr, __webpack_exports__numberNodeToStr as numberNodeToStr, __webpack_exports__treeToStr as treeToStr };
