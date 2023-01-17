@@ -2,7 +2,7 @@
     "name": "flo-ll-rb-tree",
     "sideEffects": false,
     "description": "A simple left leaning red black tree implementation.",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "author": {
         "name": "Floris Steenkamp"
     },
