@@ -10,15 +10,32 @@ const RED = 0;
  * Red Black Tree node.
  */
 class Node {
+    datum;
+    color = RED;
+    parent;
+    extras;
+    "-1";
+    "1";
     constructor(datum) {
         this.datum = datum;
-        this.color = RED;
     }
 }
 function isRed(node) {
     return !!node && node.color === RED;
 }
 class LlRbTree {
+    compare;
+    duplicatesAllowed;
+    root;
+    /**
+     * The number of nodes in the tree (that equals the number of values in the
+     * tree not counting duplicates).
+     */
+    nodeCount;
+    /**
+     * The number of values in the tree.
+     */
+    valueCount;
     /**
      * @param compare a comparator function
      * @param duplicatesAllowed defaults to `true`; if `false` then if a
@@ -30,10 +47,6 @@ class LlRbTree {
     constructor(compare, duplicatesAllowed = true, data) {
         this.compare = compare;
         this.duplicatesAllowed = duplicatesAllowed;
-        // eslint-disable-next-line
-        this.getMinNode = this.getMinOrMaxNode(LEFT);
-        // eslint-disable-next-line
-        this.getMaxNode = this.getMinOrMaxNode(RIGHT);
         this.root = undefined;
         this.nodeCount = 0;
         this.valueCount = 0;
@@ -405,6 +418,10 @@ class LlRbTree {
             return node;
         };
     }
+    // eslint-disable-next-line
+    getMinNode = this.getMinOrMaxNode(LEFT);
+    // eslint-disable-next-line
+    getMaxNode = this.getMinOrMaxNode(RIGHT);
     /**
      * Returns the minimum value in the tree starting at the given node. If the
      * tree is empty, `undefined` will be returned.

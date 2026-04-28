@@ -20,23 +20,8 @@
 /******/ })();
 /******/ 
 /************************************************************************/
-var __webpack_exports__ = {};
 
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "E5": () => (/* reexport */ BLACK),
-  "RL": () => (/* reexport */ LEFT),
-  "dn": () => (/* reexport */ LlRbTree),
-  "NB": () => (/* reexport */ Node),
-  "hM": () => (/* reexport */ RED),
-  "pX": () => (/* reexport */ RIGHT),
-  "xC": () => (/* reexport */ isRed),
-  "iK": () => (/* reexport */ nodeToStr),
-  "Wl": () => (/* reexport */ numberNodeToStr),
-  "Qx": () => (/* reexport */ treeToStr)
-});
-
-;// CONCATENATED MODULE: ./src/tree.ts
+;// ./src/tree.ts
 // Concise, Destructive, Left Leaning Red Black Tree implementation.
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
@@ -49,15 +34,32 @@ const RED = 0;
  * Red Black Tree node.
  */
 class Node {
+    datum;
+    color = RED;
+    parent;
+    extras;
+    "-1";
+    "1";
     constructor(datum) {
         this.datum = datum;
-        this.color = RED;
     }
 }
 function isRed(node) {
     return !!node && node.color === RED;
 }
 class LlRbTree {
+    compare;
+    duplicatesAllowed;
+    root;
+    /**
+     * The number of nodes in the tree (that equals the number of values in the
+     * tree not counting duplicates).
+     */
+    nodeCount;
+    /**
+     * The number of values in the tree.
+     */
+    valueCount;
     /**
      * @param compare a comparator function
      * @param duplicatesAllowed defaults to `true`; if `false` then if a
@@ -69,10 +71,6 @@ class LlRbTree {
     constructor(compare, duplicatesAllowed = true, data) {
         this.compare = compare;
         this.duplicatesAllowed = duplicatesAllowed;
-        // eslint-disable-next-line
-        this.getMinNode = this.getMinOrMaxNode(LEFT);
-        // eslint-disable-next-line
-        this.getMaxNode = this.getMinOrMaxNode(RIGHT);
         this.root = undefined;
         this.nodeCount = 0;
         this.valueCount = 0;
@@ -444,6 +442,10 @@ class LlRbTree {
             return node;
         };
     }
+    // eslint-disable-next-line
+    getMinNode = this.getMinOrMaxNode(LEFT);
+    // eslint-disable-next-line
+    getMaxNode = this.getMinOrMaxNode(RIGHT);
     /**
      * Returns the minimum value in the tree starting at the given node. If the
      * tree is empty, `undefined` will be returned.
@@ -591,7 +593,7 @@ function fixUp(h) {
 }
 
 
-;// CONCATENATED MODULE: ./src/node-to-str.ts
+;// ./src/node-to-str.ts
 
 function nodeToStr(valToStr) {
     return (node) => {
@@ -607,12 +609,12 @@ function nodeToStr(valToStr) {
 }
 
 
-;// CONCATENATED MODULE: ./src/number-node-to-str.ts
+;// ./src/number-node-to-str.ts
 
 const numberNodeToStr = nodeToStr(t => t.toString());
 
 
-;// CONCATENATED MODULE: ./src/tree-to-string.ts
+;// ./src/tree-to-string.ts
 // Modified from https://www.geeksforgeeks.org/binary-tree-string-brackets/
 
 /**
@@ -650,21 +652,11 @@ function treeToStr(nodeToStrFunc) {
 }
 
 
-;// CONCATENATED MODULE: ./src/index.ts
+;// ./src/index.ts
 
 
 
 
 
 
-var __webpack_exports__BLACK = __webpack_exports__.E5;
-var __webpack_exports__LEFT = __webpack_exports__.RL;
-var __webpack_exports__LlRbTree = __webpack_exports__.dn;
-var __webpack_exports__Node = __webpack_exports__.NB;
-var __webpack_exports__RED = __webpack_exports__.hM;
-var __webpack_exports__RIGHT = __webpack_exports__.pX;
-var __webpack_exports__isRed = __webpack_exports__.xC;
-var __webpack_exports__nodeToStr = __webpack_exports__.iK;
-var __webpack_exports__numberNodeToStr = __webpack_exports__.Wl;
-var __webpack_exports__treeToStr = __webpack_exports__.Qx;
-export { __webpack_exports__BLACK as BLACK, __webpack_exports__LEFT as LEFT, __webpack_exports__LlRbTree as LlRbTree, __webpack_exports__Node as Node, __webpack_exports__RED as RED, __webpack_exports__RIGHT as RIGHT, __webpack_exports__isRed as isRed, __webpack_exports__nodeToStr as nodeToStr, __webpack_exports__numberNodeToStr as numberNodeToStr, __webpack_exports__treeToStr as treeToStr };
+export { BLACK, LEFT, LlRbTree, Node, RED, RIGHT, isRed, nodeToStr, numberNodeToStr, treeToStr };
