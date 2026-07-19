@@ -26,6 +26,8 @@ export default function(wallaby) {
             // var should = chai.should();
         },
 
-        workers: { restart: true }
+        workers: { restart: true },
+
+        maxConsoleMessagesPerTest: 250
     };
 };

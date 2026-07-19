@@ -1,4 +1,4 @@
-import { LlRbTree } from "../../src/index.js";
+import { LlRbTree } from "../../src/ll-rb-tree/ll-rb-tree.js";
 import { getLeaves } from "./get-leaves.js";
 import { route } from './route.js';
 import { traverseInOrder } from './traverse-in-order.js';

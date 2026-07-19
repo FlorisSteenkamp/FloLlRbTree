@@ -1,4 +1,4 @@
-import { nodeToString } from "../../src/index.js";
+import { nodeToString } from "../../src/ll-rb-tree/ll-rb-tree.js";
 import { Obj } from './obj.js';
 
 

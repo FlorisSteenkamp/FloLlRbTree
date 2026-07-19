@@ -1,4 +1,4 @@
-import { LlRbTree, LEFT, RIGHT, Node } from "../../src/index.js";
+import { LlRbTree, LEFT, RIGHT, Node } from "../../src/ll-rb-tree/ll-rb-tree.js";
 
 
 /** 

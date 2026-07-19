@@ -1,4 +1,4 @@
-import { Node, isRed } from "../../src/index.js";
+import { Node, isRed } from "../../src/ll-rb-tree/ll-rb-tree.js";
 import { Obj } from "./obj.js";
 
 

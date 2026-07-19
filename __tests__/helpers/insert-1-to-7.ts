@@ -1,4 +1,4 @@
-import { LlRbTree } from "../../src/index.js";
+import { LlRbTree } from "../../src/ll-rb-tree/ll-rb-tree.js";
 import { vals1to7 } from './vals-1-to-7.js';
 
 
