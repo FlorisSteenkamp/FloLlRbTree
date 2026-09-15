@@ -1,14 +1,12 @@
-const BLACK = 1;
-const RED = 0;
-class Node {
-    datum;
-    color = RED;
-    parent;
-    left;
-    right;
-    constructor(datum) {
-        this.datum = datum;
-    }
+import { BLACK, RED } from '../color.js';
+function createNode(datum) {
+    return {
+        color: RED,
+        parent: undefined,
+        left: undefined,
+        right: undefined,
+        datum
+    };
 }
 class RbTree {
     compare;
@@ -33,7 +31,7 @@ class RbTree {
     }
     insert(datum) {
         if (this.root === undefined) {
-            this.root = new Node(datum);
+            this.root = createNode(datum);
             this.root.color = BLACK;
             return;
         }
@@ -48,7 +46,7 @@ class RbTree {
             }
             node = c < 0 ? node.left : node.right;
         }
-        const inserted = new Node(datum);
+        const inserted = createNode(datum);
         inserted.parent = parent;
         if (this.compare(datum, parent.datum) < 0) {
             parent.left = inserted;
@@ -408,5 +406,5 @@ class RbTree {
         return node ? node.color : BLACK;
     }
 }
-export { BLACK, RED, Node, RbTree };
+export { RbTree };
 //# sourceMappingURL=rb-tree.js.map

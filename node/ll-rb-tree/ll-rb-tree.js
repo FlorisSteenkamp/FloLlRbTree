@@ -2,10 +2,9 @@
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
+import { BLACK, RED } from '../color.js';
 const LEFT = -1;
 const RIGHT = 1;
-const BLACK = 1;
-const RED = 0;
 /**
  * Red Black Tree node.
  */
@@ -565,5 +564,5 @@ function fixUp(h) {
     }
     return h;
 }
-export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed };
+export { LlRbTree, Node, LEFT, RIGHT, isRed };
 //# sourceMappingURL=ll-rb-tree.js.map

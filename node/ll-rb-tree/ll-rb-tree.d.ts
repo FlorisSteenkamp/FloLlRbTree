@@ -1,8 +1,6 @@
+import type { Color } from '../color.js';
 declare const LEFT = -1;
 declare const RIGHT = 1;
-declare const BLACK = 1;
-declare const RED = 0;
-type Color = 0 | 1;
 /**
  * Red Black Tree node.
  */
@@ -123,4 +121,4 @@ declare class LlRbTree<T> {
      */
     max(node?: Node<T> | undefined | undefined): T | undefined;
 }
-export { LlRbTree, Node, LEFT, RIGHT, RED, BLACK, isRed };
+export { LlRbTree, Node, LEFT, RIGHT, isRed };

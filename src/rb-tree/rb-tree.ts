@@ -1,21 +1,29 @@
-const BLACK = 1;
-const RED = 0;
-
-type Color = 0 | 1;
+import type { Color } from '../color.js';
+import { BLACK, RED } from '../color.js';
 
 
-class Node<T> {
-    public color: Color = RED;
-    public parent: Node<T> | undefined;
-    public left: Node<T> | undefined;
-    public right: Node<T> | undefined;
+interface RbNode<T> {
+    color: Color;
+    parent: RbNode<T> | undefined;
+    left: RbNode<T> | undefined;
+    right: RbNode<T> | undefined;
+    datum: T;
+}
 
-    constructor(public datum: T) {}
+
+function createNode<T>(datum: T): RbNode<T> {
+    return {
+        color: RED,
+        parent: undefined,
+        left: undefined,
+        right: undefined,
+        datum
+    };
 }
 
 
 class RbTree<T> {
-    private root: Node<T> | undefined;
+    public root: RbNode<T> | undefined;
 
     constructor(
             private compare: (a: T, b: T) => number) {
@@ -29,7 +37,7 @@ class RbTree<T> {
     }
 
 
-    public find(datum: T): Node<T> | undefined {
+    public find(datum: T): RbNode<T> | undefined {
         let node = this.root;
         while (node) {
             const c = this.compare(datum, node.datum);
@@ -46,13 +54,13 @@ class RbTree<T> {
 
     public insert(datum: T): void {
         if (this.root === undefined) {
-            this.root = new Node(datum);
+            this.root = createNode(datum);
             this.root.color = BLACK;
             return;
         }
 
-        let parent: Node<T> | undefined;
-        let node: Node<T> | undefined = this.root;
+        let parent: RbNode<T> | undefined;
+        let node: RbNode<T> | undefined = this.root;
 
         while (node) {
             parent = node;
@@ -66,7 +74,7 @@ class RbTree<T> {
             node = c < 0 ? node.left : node.right;
         }
 
-        const inserted = new Node(datum);
+        const inserted = createNode(datum);
         inserted.parent = parent;
         if (this.compare(datum, parent!.datum) < 0) {
             parent!.left = inserted;
@@ -96,10 +104,10 @@ class RbTree<T> {
 
 
     public findBounds(
-            datum: T): [Node<T> | undefined, Node<T> | undefined] {
+            datum: T): [RbNode<T> | undefined, RbNode<T> | undefined] {
 
         let node = this.root;
-        const bounds: [Node<T> | undefined, Node<T> | undefined] = [undefined, undefined];
+        const bounds: [RbNode<T> | undefined, RbNode<T> | undefined] = [undefined, undefined];
 
         while (node) {
             const c = this.compare(datum, node.datum);
@@ -116,7 +124,7 @@ class RbTree<T> {
     }
 
 
-    public getMinNode(node?: Node<T>): Node<T> | undefined {
+    public getMinNode(node?: RbNode<T>): RbNode<T> | undefined {
         let curr = node === undefined ? this.root : node;
         while (curr && curr.left) {
             curr = curr.left;
@@ -125,7 +133,7 @@ class RbTree<T> {
     }
 
 
-    public getMaxNode(node?: Node<T>): Node<T> | undefined {
+    public getMaxNode(node?: RbNode<T>): RbNode<T> | undefined {
         let curr = node === undefined ? this.root : node;
         while (curr && curr.right) {
             curr = curr.right;
@@ -148,10 +156,10 @@ class RbTree<T> {
         const compare = this.compare;
 
         // in-order predecessor for the BST ordering check
-        let prev: Node<T> | undefined = undefined;
+        let prev: RbNode<T> | undefined = undefined;
 
         // Returns the black-height of the subtree, or -1 if a violation was found.
-        function check(node: Node<T> | undefined): number {
+        function check(node: RbNode<T> | undefined): number {
             if (node === undefined) { return 1; }
 
             const { left, right } = node;
@@ -184,7 +192,7 @@ class RbTree<T> {
     }
 
 
-    public toStr(nodeToStrFunc: (node: Node<T>) => string) {
+    public toStr(nodeToStrFunc: (node: RbNode<T>) => string) {
         let treeStr = '';
 
         if (this.root === undefined) { return treeStr; }
@@ -192,7 +200,7 @@ class RbTree<T> {
         f(this.root);
         return treeStr;
 
-        function f(node: Node<T>): void {
+        function f(node: RbNode<T>): void {
             treeStr += nodeToStrFunc(node);
 
             if (node.left !== undefined) {
@@ -216,7 +224,7 @@ class RbTree<T> {
         f(this.root);
         return values;
 
-        function f(node: Node<T> | undefined): void {
+        function f(node: RbNode<T> | undefined): void {
             if (node === undefined) { return; }
 
             f(node.left);
@@ -226,11 +234,11 @@ class RbTree<T> {
     }
 
 
-    private removeNode(z: Node<T>): void {
+    private removeNode(z: RbNode<T>): void {
         let y = z;
         let yOriginalColor = y.color;
-        let x: Node<T> | undefined;
-        let xParent: Node<T> | undefined;
+        let x: RbNode<T> | undefined;
+        let xParent: RbNode<T> | undefined;
 
         if (z.left === undefined) {
             x = z.right;
@@ -269,7 +277,7 @@ class RbTree<T> {
     }
 
 
-    private fixInsert(z: Node<T>): void {
+    private fixInsert(z: RbNode<T>): void {
         let node = z;
 
         while (node.parent && node.parent.color === RED) {
@@ -319,7 +327,7 @@ class RbTree<T> {
     }
 
 
-    private fixDelete(x: Node<T> | undefined, parent: Node<T> | undefined): void {
+    private fixDelete(x: RbNode<T> | undefined, parent: RbNode<T> | undefined): void {
         let node = x;
         let nodeParent = parent;
 
@@ -415,7 +423,7 @@ class RbTree<T> {
     }
 
 
-    private transplant(u: Node<T>, v: Node<T> | undefined): void {
+    private transplant(u: RbNode<T>, v: RbNode<T> | undefined): void {
         if (u.parent === undefined) {
             this.root = v;
         } else if (u === u.parent.left) {
@@ -430,7 +438,7 @@ class RbTree<T> {
     }
 
 
-    private rotateLeft(x: Node<T>): void {
+    private rotateLeft(x: RbNode<T>): void {
         const y = x.right!;
         x.right = y.left;
         if (y.left) {
@@ -451,7 +459,7 @@ class RbTree<T> {
     }
 
 
-    private rotateRight(x: Node<T>): void {
+    private rotateRight(x: RbNode<T>): void {
         const y = x.left!;
         x.left = y.right;
         if (y.right) {
@@ -472,10 +480,10 @@ class RbTree<T> {
     }
 
 
-    private colorOf(node: Node<T> | undefined): Color {
+    private colorOf(node: RbNode<T> | undefined): Color {
         return node ? node.color : BLACK;
     }
 }
 
 
-export { BLACK, RED, Node, RbTree };
+export { RbNode, RbTree };

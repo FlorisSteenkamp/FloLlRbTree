@@ -3,14 +3,13 @@
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
 
+import type { Color } from '../color.js';
+import { BLACK, RED } from '../color.js';
+
 
 const LEFT = -1;
 const RIGHT = 1;
 type Dir = -1|1;
-
-const BLACK = 1;
-const RED = 0;
-type Color = 0|1;
 
 
 /**
@@ -659,6 +658,6 @@ function fixUp<T>(h: Node<T>): Node<T> {
 
 export { 
     LlRbTree, Node, 
-    LEFT, RIGHT, RED, BLACK, 
+    LEFT, RIGHT,
     isRed
 }

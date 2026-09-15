@@ -4,16 +4,15 @@
 // See: https://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
 // See: https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree
 // See: http://www.teachsolaisgames.com/articles/balanced_left_leaning.html 
+
 const LEFT = -1;
 const RIGHT = 1;
-const BLACK = 1;
-const RED = 0;
 /**
  * Red Black Tree node.
  */
 class Node {
     datum;
-    color = RED;
+    color = (/* inlined export .RED */0);
     parent;
     extras;
     "-1";
@@ -23,7 +22,7 @@ class Node {
     }
 }
 function isRed(node) {
-    return !!node && node.color === RED;
+    return !!node && node.color === (/* inlined export .RED */0);
 }
 class LlRbTree {
     compare;
@@ -108,7 +107,7 @@ class LlRbTree {
     insert(datum) {
         const tree = this;
         tree.root = f(tree.root, datum);
-        tree.root.color = BLACK;
+        tree.root.color = (/* inlined export .BLACK */1);
         tree.root.parent = undefined;
         function f(h, datum) {
             if (h === undefined) {
@@ -169,7 +168,7 @@ class LlRbTree {
         }
         tree.root = root;
         if (tree.root !== undefined) {
-            tree.root.color = BLACK;
+            tree.root.color = (/* inlined export .BLACK */1);
             tree.root.parent = undefined;
         }
         return removed;
@@ -481,7 +480,7 @@ function rotate(dir, h) {
     x[dir] = h;
     h.parent = x;
     x.color = h.color;
-    h.color = RED;
+    h.color = (/* inlined export .RED */0);
     return x;
 }
 /**
@@ -629,17 +628,15 @@ function treeToStr(nodeToStrFunc) {
 
 
 ;// ./src/rb-tree/rb-tree.ts
-const rb_tree_BLACK = 1;
-const rb_tree_RED = 0;
-class rb_tree_Node {
-    datum;
-    color = rb_tree_RED;
-    parent;
-    left;
-    right;
-    constructor(datum) {
-        this.datum = datum;
-    }
+
+function createNode(datum) {
+    return {
+        color: (/* inlined export .RED */0),
+        parent: undefined,
+        left: undefined,
+        right: undefined,
+        datum
+    };
 }
 class RbTree {
     compare;
@@ -664,8 +661,8 @@ class RbTree {
     }
     insert(datum) {
         if (this.root === undefined) {
-            this.root = new rb_tree_Node(datum);
-            this.root.color = rb_tree_BLACK;
+            this.root = createNode(datum);
+            this.root.color = (/* inlined export .BLACK */1);
             return;
         }
         let parent;
@@ -679,7 +676,7 @@ class RbTree {
             }
             node = c < 0 ? node.left : node.right;
         }
-        const inserted = new rb_tree_Node(datum);
+        const inserted = createNode(datum);
         inserted.parent = parent;
         if (this.compare(datum, parent.datum) < 0) {
             parent.left = inserted;
@@ -739,7 +736,7 @@ class RbTree {
         if (this.root === undefined) {
             return true;
         }
-        if (this.root.color !== rb_tree_BLACK) {
+        if (this.root.color !== (/* inlined export .BLACK */1)) {
             return false;
         }
         const compare = this.compare;
@@ -752,8 +749,8 @@ class RbTree {
             }
             const { left, right } = node;
             // no red node has a red child
-            if (node.color === rb_tree_RED &&
-                (left?.color === rb_tree_RED || right?.color === rb_tree_RED)) {
+            if (node.color === (/* inlined export .RED */0) &&
+                (left?.color === (/* inlined export .RED */0) || right?.color === (/* inlined export .RED */0))) {
                 return -1;
             }
             const leftHeight = check(left);
@@ -773,7 +770,7 @@ class RbTree {
             if (leftHeight !== rightHeight) {
                 return -1;
             }
-            return leftHeight + (node.color === rb_tree_BLACK ? 1 : 0);
+            return leftHeight + (node.color === (/* inlined export .BLACK */1) ? 1 : 0);
         }
         return check(this.root) !== -1;
     }
@@ -847,21 +844,21 @@ class RbTree {
             y.left.parent = y;
             y.color = z.color;
         }
-        if (yOriginalColor === rb_tree_BLACK) {
+        if (yOriginalColor === (/* inlined export .BLACK */1)) {
             this.fixDelete(x, xParent);
         }
     }
     fixInsert(z) {
         let node = z;
-        while (node.parent && node.parent.color === rb_tree_RED) {
+        while (node.parent && node.parent.color === (/* inlined export .RED */0)) {
             const parent = node.parent;
             const grandParent = parent.parent;
             if (parent === grandParent.left) {
                 const uncle = grandParent.right;
-                if (this.colorOf(uncle) === rb_tree_RED) {
-                    parent.color = rb_tree_BLACK;
-                    uncle.color = rb_tree_BLACK;
-                    grandParent.color = rb_tree_RED;
+                if (this.colorOf(uncle) === (/* inlined export .RED */0)) {
+                    parent.color = (/* inlined export .BLACK */1);
+                    uncle.color = (/* inlined export .BLACK */1);
+                    grandParent.color = (/* inlined export .RED */0);
                     node = grandParent;
                 }
                 else {
@@ -869,17 +866,17 @@ class RbTree {
                         node = parent;
                         this.rotateLeft(node);
                     }
-                    node.parent.color = rb_tree_BLACK;
-                    grandParent.color = rb_tree_RED;
+                    node.parent.color = (/* inlined export .BLACK */1);
+                    grandParent.color = (/* inlined export .RED */0);
                     this.rotateRight(grandParent);
                 }
             }
             else {
                 const uncle = grandParent.left;
-                if (this.colorOf(uncle) === rb_tree_RED) {
-                    parent.color = rb_tree_BLACK;
-                    uncle.color = rb_tree_BLACK;
-                    grandParent.color = rb_tree_RED;
+                if (this.colorOf(uncle) === (/* inlined export .RED */0)) {
+                    parent.color = (/* inlined export .BLACK */1);
+                    uncle.color = (/* inlined export .BLACK */1);
+                    grandParent.color = (/* inlined export .RED */0);
                     node = grandParent;
                 }
                 else {
@@ -887,43 +884,43 @@ class RbTree {
                         node = parent;
                         this.rotateRight(node);
                     }
-                    node.parent.color = rb_tree_BLACK;
-                    grandParent.color = rb_tree_RED;
+                    node.parent.color = (/* inlined export .BLACK */1);
+                    grandParent.color = (/* inlined export .RED */0);
                     this.rotateLeft(grandParent);
                 }
             }
         }
-        this.root.color = rb_tree_BLACK;
+        this.root.color = (/* inlined export .BLACK */1);
     }
     fixDelete(x, parent) {
         let node = x;
         let nodeParent = parent;
-        while (node !== this.root && this.colorOf(node) === rb_tree_BLACK) {
+        while (node !== this.root && this.colorOf(node) === (/* inlined export .BLACK */1)) {
             if (nodeParent === undefined) {
                 break;
             }
             if (node === nodeParent?.left) {
                 let sibling = nodeParent.right;
-                if (this.colorOf(sibling) === rb_tree_RED) {
-                    sibling.color = rb_tree_BLACK;
-                    nodeParent.color = rb_tree_RED;
+                if (this.colorOf(sibling) === (/* inlined export .RED */0)) {
+                    sibling.color = (/* inlined export .BLACK */1);
+                    nodeParent.color = (/* inlined export .RED */0);
                     this.rotateLeft(nodeParent);
                     sibling = nodeParent.right;
                 }
-                if (this.colorOf(sibling?.left) === rb_tree_BLACK && this.colorOf(sibling?.right) === rb_tree_BLACK) {
+                if (this.colorOf(sibling?.left) === (/* inlined export .BLACK */1) && this.colorOf(sibling?.right) === (/* inlined export .BLACK */1)) {
                     if (sibling) {
-                        sibling.color = rb_tree_RED;
+                        sibling.color = (/* inlined export .RED */0);
                     }
                     node = nodeParent;
                     nodeParent = node?.parent;
                 }
                 else {
-                    if (this.colorOf(sibling?.right) === rb_tree_BLACK) {
+                    if (this.colorOf(sibling?.right) === (/* inlined export .BLACK */1)) {
                         if (sibling?.left) {
-                            sibling.left.color = rb_tree_BLACK;
+                            sibling.left.color = (/* inlined export .BLACK */1);
                         }
                         if (sibling) {
-                            sibling.color = rb_tree_RED;
+                            sibling.color = (/* inlined export .RED */0);
                             this.rotateRight(sibling);
                         }
                         sibling = nodeParent.right;
@@ -931,9 +928,9 @@ class RbTree {
                     if (sibling) {
                         sibling.color = nodeParent.color;
                     }
-                    nodeParent.color = rb_tree_BLACK;
+                    nodeParent.color = (/* inlined export .BLACK */1);
                     if (sibling?.right) {
-                        sibling.right.color = rb_tree_BLACK;
+                        sibling.right.color = (/* inlined export .BLACK */1);
                     }
                     this.rotateLeft(nodeParent);
                     node = this.root;
@@ -942,26 +939,26 @@ class RbTree {
             }
             else {
                 let sibling = nodeParent?.left;
-                if (this.colorOf(sibling) === rb_tree_RED) {
-                    sibling.color = rb_tree_BLACK;
-                    nodeParent.color = rb_tree_RED;
+                if (this.colorOf(sibling) === (/* inlined export .RED */0)) {
+                    sibling.color = (/* inlined export .BLACK */1);
+                    nodeParent.color = (/* inlined export .RED */0);
                     this.rotateRight(nodeParent);
                     sibling = nodeParent.left;
                 }
-                if (this.colorOf(sibling?.left) === rb_tree_BLACK && this.colorOf(sibling?.right) === rb_tree_BLACK) {
+                if (this.colorOf(sibling?.left) === (/* inlined export .BLACK */1) && this.colorOf(sibling?.right) === (/* inlined export .BLACK */1)) {
                     if (sibling) {
-                        sibling.color = rb_tree_RED;
+                        sibling.color = (/* inlined export .RED */0);
                     }
                     node = nodeParent;
                     nodeParent = nodeParent?.parent;
                 }
                 else {
-                    if (this.colorOf(sibling?.left) === rb_tree_BLACK) {
+                    if (this.colorOf(sibling?.left) === (/* inlined export .BLACK */1)) {
                         if (sibling?.right) {
-                            sibling.right.color = rb_tree_BLACK;
+                            sibling.right.color = (/* inlined export .BLACK */1);
                         }
                         if (sibling) {
-                            sibling.color = rb_tree_RED;
+                            sibling.color = (/* inlined export .RED */0);
                             this.rotateLeft(sibling);
                         }
                         sibling = nodeParent?.left;
@@ -969,9 +966,9 @@ class RbTree {
                     if (sibling) {
                         sibling.color = nodeParent.color;
                     }
-                    nodeParent.color = rb_tree_BLACK;
+                    nodeParent.color = (/* inlined export .BLACK */1);
                     if (sibling?.left) {
-                        sibling.left.color = rb_tree_BLACK;
+                        sibling.left.color = (/* inlined export .BLACK */1);
                     }
                     this.rotateRight(nodeParent);
                     node = this.root;
@@ -980,7 +977,7 @@ class RbTree {
             }
         }
         if (node) {
-            node.color = rb_tree_BLACK;
+            node.color = (/* inlined export .BLACK */1);
         }
     }
     transplant(u, v) {
@@ -1036,7 +1033,7 @@ class RbTree {
         x.parent = y;
     }
     colorOf(node) {
-        return node ? node.color : rb_tree_BLACK;
+        return node ? node.color : (/* inlined export .BLACK */1);
     }
 }
 
@@ -1048,8 +1045,9 @@ class RbTree {
 
 
 
-const __webpack_exports__BLACK = (/* inlined export .BLACK */1);
+
 const __webpack_exports__LEFT = (/* inlined export .LEFT */-1);
-const __webpack_exports__RED = (/* inlined export .RED */0);
 const __webpack_exports__RIGHT = (/* inlined export .RIGHT */1);
-export { __webpack_exports__BLACK as BLACK, __webpack_exports__LEFT as LEFT, LlRbTree, Node, __webpack_exports__RED as RED, __webpack_exports__RIGHT as RIGHT, RbTree, isRed, nodeToStr, numberNodeToStr, treeToStr };
+export { __webpack_exports__LEFT as LEFT, LlRbTree, Node, __webpack_exports__RIGHT as RIGHT, RbTree, isRed, nodeToStr, numberNodeToStr, treeToStr };
+export const BLACK = (/* inlined export .BLACK */1);
+export const RED = (/* inlined export .RED */0);
