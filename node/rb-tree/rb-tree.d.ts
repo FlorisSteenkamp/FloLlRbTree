@@ -9,6 +9,7 @@ interface RbNode<T> {
 declare class RbTree<T> {
     private compare;
     root: RbNode<T> | undefined;
+    size: number;
     constructor(compare: (a: T, b: T) => number);
     isEmpty(): boolean;
     find(datum: T): RbNode<T> | undefined;

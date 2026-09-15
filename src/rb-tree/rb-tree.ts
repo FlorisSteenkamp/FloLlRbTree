@@ -24,11 +24,13 @@ function createNode<T>(datum: T): RbNode<T> {
 
 class RbTree<T> {
     public root: RbNode<T> | undefined;
+    public size: number;
 
     constructor(
             private compare: (a: T, b: T) => number) {
 
         this.root = undefined;
+        this.size = 0;
     }
 
 
@@ -56,6 +58,7 @@ class RbTree<T> {
         if (this.root === undefined) {
             this.root = createNode(datum);
             this.root.color = BLACK;
+            this.size = 1;
             return;
         }
 
@@ -82,6 +85,7 @@ class RbTree<T> {
             parent!.right = inserted;
         }
 
+        this.size++;
         this.fixInsert(inserted);
     }
 
@@ -98,6 +102,7 @@ class RbTree<T> {
 
         const removed = node.datum;
         this.removeNode(node);
+        this.size--;
 
         return removed;
     }

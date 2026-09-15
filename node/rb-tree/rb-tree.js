@@ -11,9 +11,11 @@ function createNode(datum) {
 class RbTree {
     compare;
     root;
+    size;
     constructor(compare) {
         this.compare = compare;
         this.root = undefined;
+        this.size = 0;
     }
     isEmpty() {
         return this.root === undefined;
@@ -33,6 +35,7 @@ class RbTree {
         if (this.root === undefined) {
             this.root = createNode(datum);
             this.root.color = BLACK;
+            this.size = 1;
             return;
         }
         let parent;
@@ -54,6 +57,7 @@ class RbTree {
         else {
             parent.right = inserted;
         }
+        this.size++;
         this.fixInsert(inserted);
     }
     remove(datum, _all = false, _compareStrict) {
@@ -63,6 +67,7 @@ class RbTree {
         }
         const removed = node.datum;
         this.removeNode(node);
+        this.size--;
         return removed;
     }
     findBounds(datum) {
