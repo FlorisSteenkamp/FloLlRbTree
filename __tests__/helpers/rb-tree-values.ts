@@ -1,4 +1,4 @@
-import { RbTree } from '../../src/rb-tree/rb-tree.js';
+import type { RbTree } from '../../src/rb-tree/rb-tree.js';
 
 
 function rbTreeToValues<T>(tree: RbTree<T>): T[] {

@@ -45,5 +45,16 @@ describe('rb-tree new', function() {
             expect(tree.find({ val: 3 })?.datum).toEqual({ val: 3, name: 'pear' });
             expect(rbTreeToValues(tree).map(o => o.name)).toEqual(['pear']);
         }
+
+        {
+            const tree = new RbTree(compare);
+
+            tree.insert(2);
+            tree.insert(1);
+            tree.insert(3);
+
+            expect(tree.toStr(node => node.datum.toString())).toBe('2(1)[3]');
+            expect(tree.toArr()).toEqual([1, 2, 3]);
+        }
     });
 });

@@ -134,6 +134,98 @@ class RbTree<T> {
     }
 
 
+    /**
+     * Checks that the tree satisfies the binary search tree ordering property
+     * and the red-black constraints (root is black, no red node has a red
+     * child, and every root-to-leaf path has the same number of black nodes).
+     * 
+     * Returns `true` if all checks pass, `false` otherwise.
+     */
+    public checkIntegrity(): boolean {
+        if (this.root === undefined) { return true; }
+        if (this.root.color !== BLACK) { return false; }
+
+        const compare = this.compare;
+
+        // in-order predecessor for the BST ordering check
+        let prev: Node<T> | undefined = undefined;
+
+        // Returns the black-height of the subtree, or -1 if a violation was found.
+        function check(node: Node<T> | undefined): number {
+            if (node === undefined) { return 1; }
+
+            const { left, right } = node;
+
+            // no red node has a red child
+            if (node.color === RED &&
+                (left?.color === RED || right?.color === RED)) {
+                return -1;
+            }
+
+            const leftHeight = check(left);
+            if (leftHeight === -1) { return -1; }
+
+            // BST ordering (in-order traversal must be strictly increasing)
+            if (prev !== undefined && compare(prev.datum, node.datum) >= 0) {
+                return -1;
+            }
+            prev = node;
+
+            const rightHeight = check(right);
+            if (rightHeight === -1) { return -1; }
+
+            // equal black-height on both sides
+            if (leftHeight !== rightHeight) { return -1; }
+
+            return leftHeight + (node.color === BLACK ? 1 : 0);
+        }
+
+        return check(this.root) !== -1;
+    }
+
+
+    public toStr(nodeToStrFunc: (node: Node<T>) => string) {
+        let treeStr = '';
+
+        if (this.root === undefined) { return treeStr; }
+
+        f(this.root);
+        return treeStr;
+
+        function f(node: Node<T>): void {
+            treeStr += nodeToStrFunc(node);
+
+            if (node.left !== undefined) {
+                treeStr += '(';
+                f(node.left);
+                treeStr += ')';
+            }
+
+            if (node.right !== undefined) {
+                treeStr += '[';
+                f(node.right);
+                treeStr += ']';
+            }
+        }
+    }
+
+
+    public toArr(): T[] {
+        const values: T[] = [];
+
+        f(this.root);
+        return values;
+
+        function f(node: Node<T> | undefined): void {
+            if (node === undefined) { return; }
+
+            f(node.left);
+            values.push(node.datum);
+            f(node.right);
+        }
+    }
+
+
     private removeNode(z: Node<T>): void {
         let y = z;
         let yOriginalColor = y.color;

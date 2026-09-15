@@ -20,6 +20,16 @@ declare class RbTree<T> {
     findBounds(datum: T): [Node<T> | undefined, Node<T> | undefined];
     getMinNode(node?: Node<T>): Node<T> | undefined;
     getMaxNode(node?: Node<T>): Node<T> | undefined;
+    /**
+     * Checks that the tree satisfies the binary search tree ordering property
+     * and the red-black constraints (root is black, no red node has a red
+     * child, and every root-to-leaf path has the same number of black nodes).
+     *
+     * Returns `true` if all checks pass, `false` otherwise.
+     */
+    checkIntegrity(): boolean;
+    toStr(nodeToStrFunc: (node: Node<T>) => string): string;
+    toArr(): T[];
     private removeNode;
     private fixInsert;
     private fixDelete;
