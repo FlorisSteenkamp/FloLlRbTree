@@ -12,10 +12,18 @@ class RbTree {
     compare;
     root;
     size;
+    minNode;
+    maxNode;
+    minNodeStale = true;
+    maxNodeStale = true;
     constructor(compare) {
         this.compare = compare;
         this.root = undefined;
         this.size = 0;
+        this.minNode = undefined;
+        this.maxNode = undefined;
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
     }
     isEmpty() {
         return this.root === undefined;
@@ -32,6 +40,8 @@ class RbTree {
         return undefined;
     }
     insert(datum) {
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
         if (this.root === undefined) {
             this.root = createNode(datum);
             this.root.color = BLACK;
@@ -60,7 +70,7 @@ class RbTree {
         this.size++;
         this.fixInsert(inserted);
     }
-    remove(datum, _all = false, _compareStrict) {
+    remove(datum) {
         const node = this.find(datum);
         if (node === undefined) {
             return undefined;
@@ -68,6 +78,8 @@ class RbTree {
         const removed = node.datum;
         this.removeNode(node);
         this.size--;
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
         return removed;
     }
     findBounds(datum) {
@@ -86,18 +98,28 @@ class RbTree {
         }
         return bounds;
     }
-    getMinNode(node) {
-        let curr = node === undefined ? this.root : node;
+    getMinNode() {
+        if (!this.minNodeStale) {
+            return this.minNode;
+        }
+        let curr = this.root;
         while (curr && curr.left) {
             curr = curr.left;
         }
+        this.minNode = curr;
+        this.minNodeStale = false;
         return curr;
     }
-    getMaxNode(node) {
-        let curr = node === undefined ? this.root : node;
+    getMaxNode() {
+        if (!this.maxNodeStale) {
+            return this.maxNode;
+        }
+        let curr = this.root;
         while (curr && curr.right) {
             curr = curr.right;
         }
+        this.maxNode = curr;
+        this.maxNodeStale = false;
         return curr;
     }
     /**
@@ -184,6 +206,8 @@ class RbTree {
         }
     }
     removeNode(z) {
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
         let y = z;
         let yOriginalColor = y.color;
         let x;
@@ -199,7 +223,10 @@ class RbTree {
             this.transplant(z, z.left);
         }
         else {
-            y = this.getMinNode(z.right);
+            y = z.right;
+            while (y.left) {
+                y = y.left;
+            }
             yOriginalColor = y.color;
             x = y.right;
             if (y.parent === z) {

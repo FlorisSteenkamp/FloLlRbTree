@@ -25,12 +25,20 @@ function createNode<T>(datum: T): RbNode<T> {
 class RbTree<T> {
     public root: RbNode<T> | undefined;
     public size: number;
+    private minNode: RbNode<T> | undefined;
+    private maxNode: RbNode<T> | undefined;
+    private minNodeStale = true;
+    private maxNodeStale = true;
 
     constructor(
             private compare: (a: T, b: T) => number) {
 
         this.root = undefined;
         this.size = 0;
+        this.minNode = undefined;
+        this.maxNode = undefined;
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
     }
 
 
@@ -54,7 +62,12 @@ class RbTree<T> {
     }
 
 
-    public insert(datum: T): void {
+    public insert(
+            datum: T): void {
+
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
+
         if (this.root === undefined) {
             this.root = createNode(datum);
             this.root.color = BLACK;
@@ -91,9 +104,7 @@ class RbTree<T> {
 
 
     public remove(
-            datum: T,
-            _all = false,
-            _compareStrict?: (t1: T, t2: T) => boolean): T | undefined {
+            datum: T): T | undefined {
 
         const node = this.find(datum);
         if (node === undefined) {
@@ -103,6 +114,8 @@ class RbTree<T> {
         const removed = node.datum;
         this.removeNode(node);
         this.size--;
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
 
         return removed;
     }
@@ -129,20 +142,32 @@ class RbTree<T> {
     }
 
 
-    public getMinNode(node?: RbNode<T>): RbNode<T> | undefined {
-        let curr = node === undefined ? this.root : node;
+    public getMinNode(): RbNode<T> | undefined {
+        if (!this.minNodeStale) {
+            return this.minNode;
+        }
+
+        let curr = this.root;
         while (curr && curr.left) {
             curr = curr.left;
         }
+        this.minNode = curr;
+        this.minNodeStale = false;
         return curr;
     }
 
 
-    public getMaxNode(node?: RbNode<T>): RbNode<T> | undefined {
-        let curr = node === undefined ? this.root : node;
+    public getMaxNode(): RbNode<T> | undefined {
+        if (!this.maxNodeStale) {
+            return this.maxNode;
+        }
+
+        let curr = this.root;
         while (curr && curr.right) {
             curr = curr.right;
         }
+        this.maxNode = curr;
+        this.maxNodeStale = false;
         return curr;
     }
 
@@ -240,6 +265,9 @@ class RbTree<T> {
 
 
     private removeNode(z: RbNode<T>): void {
+        this.minNodeStale = true;
+        this.maxNodeStale = true;
+
         let y = z;
         let yOriginalColor = y.color;
         let x: RbNode<T> | undefined;
@@ -254,7 +282,10 @@ class RbTree<T> {
             xParent = z.parent;
             this.transplant(z, z.left);
         } else {
-            y = this.getMinNode(z.right)!;
+            y = z.right;
+            while (y.left) {
+                y = y.left;
+            }
             yOriginalColor = y.color;
             x = y.right;
 

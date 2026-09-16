@@ -10,14 +10,18 @@ declare class RbTree<T> {
     private compare;
     root: RbNode<T> | undefined;
     size: number;
+    private minNode;
+    private maxNode;
+    private minNodeStale;
+    private maxNodeStale;
     constructor(compare: (a: T, b: T) => number);
     isEmpty(): boolean;
     find(datum: T): RbNode<T> | undefined;
     insert(datum: T): void;
-    remove(datum: T, _all?: boolean, _compareStrict?: (t1: T, t2: T) => boolean): T | undefined;
+    remove(datum: T): T | undefined;
     findBounds(datum: T): [RbNode<T> | undefined, RbNode<T> | undefined];
-    getMinNode(node?: RbNode<T>): RbNode<T> | undefined;
-    getMaxNode(node?: RbNode<T>): RbNode<T> | undefined;
+    getMinNode(): RbNode<T> | undefined;
+    getMaxNode(): RbNode<T> | undefined;
     /**
      * Checks that the tree satisfies the binary search tree ordering property
      * and the red-black constraints (root is black, no red node has a red
